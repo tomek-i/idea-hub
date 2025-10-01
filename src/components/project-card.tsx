@@ -1,7 +1,7 @@
-import { ArrowRight, Github, ListTodo, Trash2 } from "lucide-react";
-import Link from "next/link";
-import type React from "react";
-import { toast } from "sonner";
+import { ArrowRight, Github, ListTodo, Trash2 } from 'lucide-react';
+import Link from 'next/link';
+import type React from 'react';
+import { toast } from 'sonner';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,11 +12,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import type { ProjectActions } from "@/context/projects-context";
-import type { Project } from "@/lib/types";
-import { Button } from "./ui/button";
-import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card";
+} from '@/components/ui/alert-dialog';
+import type { ProjectActions } from '@/context/projects-context';
+import type { Project } from '@/lib/types';
+import { Button } from './ui/button';
+import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
 
 interface ProjectCardProps {
   project: Project;
@@ -30,7 +30,7 @@ export function ProjectCard({ project, onSelectProject, projectActions }: Projec
   const handleMoveToRefined = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (projectActions?.updateProjectStatus) {
-      projectActions.updateProjectStatus(project.id, "refined");
+      projectActions.updateProjectStatus(project.id, 'refined');
       toast.success(`"${project.name}" has been moved to Refined Projects.`);
     }
   };
@@ -54,7 +54,7 @@ export function ProjectCard({ project, onSelectProject, projectActions }: Projec
         <CardHeader className="w-full">
           <CardTitle className="font-headline">{project.name}</CardTitle>
           <CardDescription className="pt-2 line-clamp-2 min-h-[40px]">
-            {project.description || "No description provided."}
+            {project.description || 'No description provided.'}
           </CardDescription>
         </CardHeader>
       </Button>
@@ -79,7 +79,7 @@ export function ProjectCard({ project, onSelectProject, projectActions }: Projec
           )}
         </div>
 
-        {project.status === "draft" && (
+        {project.status === 'draft' && (
           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
             <AlertDialog>
               <AlertDialogTrigger asChild>

@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { ListTodo, Trash2 } from "lucide-react";
-import { useState } from "react";
-import type { Project, Todo } from "@/lib/types";
-import { Button } from "./ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Checkbox } from "./ui/checkbox";
-import { Input } from "./ui/input";
+import { ListTodo, Trash2 } from 'lucide-react';
+import { useState } from 'react';
+import type { Project, Todo } from '@/lib/types';
+import { Button } from './ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Checkbox } from './ui/checkbox';
+import { Input } from './ui/input';
 
 interface TodoListProps {
   project: Project;
@@ -18,12 +18,12 @@ interface TodoListProps {
 }
 
 export function TodoList({ project, projectActions }: TodoListProps) {
-  const [newTodoText, setNewTodoText] = useState("");
+  const [newTodoText, setNewTodoText] = useState('');
 
   const handleAddTodo = () => {
     if (newTodoText.trim()) {
       projectActions.addTodo(project.id, newTodoText.trim());
-      setNewTodoText("");
+      setNewTodoText('');
     }
   };
 
@@ -48,14 +48,17 @@ export function TodoList({ project, projectActions }: TodoListProps) {
             placeholder="Add a new to-do item..."
             value={newTodoText}
             onChange={(e) => setNewTodoText(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleAddTodo()}
+            onKeyDown={(e) => e.key === 'Enter' && handleAddTodo()}
           />
           <Button onClick={handleAddTodo}>Add</Button>
         </div>
         <div className="space-y-2">
           {project.todos.length > 0 ? (
             project.todos.map((todo) => (
-              <div key={todo.id} className="flex items-center gap-3 p-2 rounded-md hover:bg-muted/50 transition-colors">
+              <div
+                key={todo.id}
+                className="flex items-center gap-3 p-2 rounded-md hover:bg-muted/50 transition-colors"
+              >
                 <Checkbox
                   id={`todo-${todo.id}`}
                   checked={todo.completed}
@@ -63,7 +66,7 @@ export function TodoList({ project, projectActions }: TodoListProps) {
                 />
                 <label
                   htmlFor={`todo-${todo.id}`}
-                  className={`flex-1 text-sm ${todo.completed ? "text-muted-foreground line-through" : ""}`}
+                  className={`flex-1 text-sm ${todo.completed ? 'text-muted-foreground line-through' : ''}`}
                 >
                   {todo.text}
                 </label>
