@@ -1,21 +1,14 @@
-'use client';
-import { Loader, NotebookText, Sparkles } from 'lucide-react';
-import { useState } from 'react';
-import { toast } from 'sonner';
-import { assistWithProjectNotes } from '@/ai/flows/assist-with-project-notes';
-import type { Project } from '@/lib/types';
-import { Button } from './ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from './ui/dialog';
-import { Label } from './ui/label';
-import { Textarea } from './ui/textarea';
+"use client";
+import { Loader, NotebookText, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import { assistWithProjectNotes } from "@/ai/flows/assist-with-project-notes";
+import type { Project } from "@/lib/types";
+import { Button } from "./ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog";
+import { Label } from "./ui/label";
+import { Textarea } from "./ui/textarea";
 
 interface NotesEditorProps {
   project: Project;
@@ -37,8 +30,8 @@ export function NotesEditor({ project, onUpdateProject }: NotesEditorProps) {
       });
       setSuggestion(result.improvedNotes);
     } catch (error) {
-      console.error('AI assistant failed:', error);
-      toast.error('Could not get suggestions. Please try again.');
+      console.error("AI assistant failed:", error);
+      toast.error("Could not get suggestions. Please try again.");
       setIsDialogOpen(false);
     } finally {
       setIsLoading(false);
@@ -67,11 +60,7 @@ export function NotesEditor({ project, onUpdateProject }: NotesEditorProps) {
               <NotebookText className="w-5 h-5" /> Notes
             </div>
             <Button variant="secondary" size="sm" onClick={handleAssist} disabled={isLoading}>
-              {isLoading ? (
-                <Loader className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <Sparkles className="mr-2 h-4 w-4" />
-              )}
+              {isLoading ? <Loader className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
               AI Assist
             </Button>
           </CardTitle>
@@ -91,9 +80,7 @@ export function NotesEditor({ project, onUpdateProject }: NotesEditorProps) {
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>AI Note Suggestions</DialogTitle>
-            <DialogDescription>
-              Here are some suggestions to improve your project notes.
-            </DialogDescription>
+            <DialogDescription>Here are some suggestions to improve your project notes.</DialogDescription>
           </DialogHeader>
           {isLoading && (
             <div className="flex items-center justify-center h-48">
@@ -105,7 +92,7 @@ export function NotesEditor({ project, onUpdateProject }: NotesEditorProps) {
               <div>
                 <Label className="font-bold">Current Notes</Label>
                 <div className="mt-2 p-3 rounded-md border bg-muted/50 text-sm whitespace-pre-wrap min-h-[200px]">
-                  {project.notes || '(empty)'}
+                  {project.notes || "(empty)"}
                 </div>
               </div>
               <div>

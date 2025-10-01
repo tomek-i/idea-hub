@@ -1,9 +1,9 @@
-'use client';
-import { Loader, Plus, Sparkles } from 'lucide-react';
-import type React from 'react';
-import { useState } from 'react';
-import { toast } from 'sonner';
-import { generateProjectIdeas } from '@/ai/flows/generate-project-ideas';
+"use client";
+import { Loader, Plus, Sparkles } from "lucide-react";
+import type React from "react";
+import { useState } from "react";
+import { toast } from "sonner";
+import { generateProjectIdeas } from "@/ai/flows/generate-project-ideas";
 import {
   Dialog,
   DialogContent,
@@ -12,20 +12,20 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { useProjectsStore } from '@/context/projects-context';
-import { Button } from './ui/button';
-import { Card, CardContent } from './ui/card';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
+} from "@/components/ui/dialog";
+import { useProjectsStore } from "@/context/projects-context";
+import { Button } from "./ui/button";
+import { Card, CardContent } from "./ui/card";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
 
 export function IdeaGeneratorDialog({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [keywords, setKeywords] = useState('');
+  const [keywords, setKeywords] = useState("");
   const [ideas, setIdeas] = useState<string[]>([]);
   const { addProject } = useProjectsStore();
-  const keywordsId = 'keywords';
+  const keywordsId = "keywords";
   const handleGenerate = async () => {
     if (!keywords.trim()) return;
     setIsLoading(true);
@@ -34,8 +34,8 @@ export function IdeaGeneratorDialog({ children }: { children: React.ReactNode })
       const result = await generateProjectIdeas({ description: keywords });
       setIdeas(result.ideas);
     } catch (error) {
-      console.error('Failed to generate ideas:', error);
-      toast.error('Could not generate ideas. Please try again.');
+      console.error("Failed to generate ideas:", error);
+      toast.error("Could not generate ideas. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -45,7 +45,7 @@ export function IdeaGeneratorDialog({ children }: { children: React.ReactNode })
     addProject({
       name: idea,
       description: `Generated from keywords: "${keywords}"`,
-      notes: '',
+      notes: "",
     });
     toast.success(`"${idea}" has been added to your drafts.`);
   };
@@ -58,9 +58,7 @@ export function IdeaGeneratorDialog({ children }: { children: React.ReactNode })
           <DialogTitle className="flex items-center gap-2">
             <Sparkles /> AI Idea Generator
           </DialogTitle>
-          <DialogDescription>
-            Enter some keywords or a description to generate new project ideas.
-          </DialogDescription>
+          <DialogDescription>Enter some keywords or a description to generate new project ideas.</DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
@@ -73,7 +71,7 @@ export function IdeaGeneratorDialog({ children }: { children: React.ReactNode })
               onChange={(e) => setKeywords(e.target.value)}
               className="col-span-3"
               placeholder="e.g., 'machine learning', 'fitness app'"
-              onKeyDown={(e) => e.key === 'Enter' && handleGenerate()}
+              onKeyDown={(e) => e.key === "Enter" && handleGenerate()}
             />
           </div>
         </div>
@@ -107,7 +105,7 @@ export function IdeaGeneratorDialog({ children }: { children: React.ReactNode })
 
         <DialogFooter>
           <Button type="button" onClick={handleGenerate} disabled={isLoading}>
-            {isLoading ? 'Generating...' : 'Generate'}
+            {isLoading ? "Generating..." : "Generate"}
           </Button>
         </DialogFooter>
       </DialogContent>
