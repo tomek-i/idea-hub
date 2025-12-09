@@ -12,3 +12,26 @@ generator client {
 datasource db {
   provider = "sqlite"
 }
+
+model Project {
+  id          String        @id @default(uuid())
+  name        String
+  description String
+  notes       String
+  todos       Todo[]
+  githubUrl   String? // nullable
+  status      ProjectStatus
+}
+
+model Todo {
+  id        String  @id @default(uuid())
+  text      String
+  completed Boolean
+  project   Project @relation(fields: [projectId], references: [id])
+  projectId String
+}
+
+enum ProjectStatus {
+  draft
+  refined
+}
