@@ -1,58 +1,32 @@
 'use server';
 
+import { AssistWithProjectNotesInputSchema, AssistWithProjectNotesOutputSchema, type AssistWithProjectNotesInput, type AssistWithProjectNotesOutput } from "../schemas/assist-with-project-notes.schema";
+import type { LanguageModelV2 } from "@openrouter/ai-sdk-provider";
+import { generateText } from "ai";
+
+
 /**
- * @fileOverview An AI assistant for improving project notes.
+ * @fileOverview An AI assistant for improving project notes using Vercel AI SDK.
  *
  * - assistWithProjectNotes - A function that suggests improvements to project notes.
  * - AssistWithProjectNotesInput - The input type for the assistWithProjectNotes function.
  * - AssistWithProjectNotesOutput - The return type for the assistWithProjectNotes function.
  */
-
-import { z } from 'genkit';
-import { ai } from '@/ai/genkit';
-
-const AssistWithProjectNotesInputSchema = z.object({
-  projectDescription: z.string().describe('The description of the project.'),
-  projectNotes: z.string().describe('The current notes for the project.'),
-});
-export type AssistWithProjectNotesInput = z.infer<typeof AssistWithProjectNotesInputSchema>;
-
-const AssistWithProjectNotesOutputSchema = z.object({
-  improvedNotes: z.string().describe('The improved notes for the project.'),
-});
-export type AssistWithProjectNotesOutput = z.infer<typeof AssistWithProjectNotesOutputSchema>;
-
 export async function assistWithProjectNotes(
-  input: AssistWithProjectNotesInput
+	input: AssistWithProjectNotesInput,
+	model: LanguageModelV2 // Accepts a model instance, e.g. openrouter.chat(...)
 ): Promise<AssistWithProjectNotesOutput> {
-  return assistWithProjectNotesFlow(input);
+	AssistWithProjectNotesInputSchema.parse(input);
+
+	const prompt = `You are an AI assistant helping to improve project notes.\n\nBased on the project description and the current project notes, suggest improvements to the notes, including grammar corrections, clarity enhancements, and relevant topic suggestions.\n\nProject Description: ${input.projectDescription}\nCurrent Project Notes: ${input.projectNotes}\n\nImproved Notes:`;
+
+	const response = await generateText({
+		model,
+		prompt,
+		temperature: 0.7,
+	});
+
+	const improvedNotes = response.text.trim();
+	AssistWithProjectNotesOutputSchema.parse({ improvedNotes });
+	return { improvedNotes };
 }
-
-const prompt = ai.definePrompt({
-  name: 'assistWithProjectNotesPrompt',
-  input: { schema: AssistWithProjectNotesInputSchema },
-  output: { schema: AssistWithProjectNotesOutputSchema },
-  prompt: `You are an AI assistant helping to improve project notes.
-
-  Based on the project description and the current project notes, suggest improvements to the notes, including grammar corrections, clarity enhancements, and relevant topic suggestions.
-
-  Project Description: {{{projectDescription}}}
-  Current Project Notes: {{{projectNotes}}}
-
-  Improved Notes:`,
-});
-
-const assistWithProjectNotesFlow = ai.defineFlow(
-  {
-    name: 'assistWithProjectNotesFlow',
-    inputSchema: AssistWithProjectNotesInputSchema,
-    outputSchema: AssistWithProjectNotesOutputSchema,
-  },
-  async (input) => {
-    const { output } = await prompt(input);
-    if (!output) {
-      throw new Error('No output from the prompt');
-    }
-    return output;
-  }
-);
