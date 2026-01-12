@@ -1,5 +1,8 @@
 'use client';
 
+import { Trash2 } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'sonner';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,9 +15,6 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useProjectsStore } from '@/context/projects-context';
-import { Trash2 } from 'lucide-react';
-import { useState } from 'react';
-import { toast } from 'sonner';
 import { Button } from './ui/button';
 
 export function PurgeDialog() {

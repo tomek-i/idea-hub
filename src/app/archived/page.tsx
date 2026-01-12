@@ -1,12 +1,12 @@
 'use client';
 
+import { useState } from 'react';
 import { Header } from '@/components/header';
 import { ProjectColumn } from '@/components/project-column';
 import { ProjectDetailsSheet } from '@/components/project-details-sheet';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useProjectsStore } from '@/context/projects-context';
 import type { Project } from '@/lib/types';
-import { useState } from 'react';
 
 export default function ArchivedPage() {
   const { projects, isLoaded, ...projectActions } = useProjectsStore();

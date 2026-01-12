@@ -1,14 +1,14 @@
 'use client';
 
-import {
-  getRelatedProjectsAction,
-  addProjectRelationAction,
-  removeProjectRelationAction,
-} from '@/app/actions/project-actions';
-import type { Project } from '@/lib/types';
 import { Link2, Plus, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import {
+  addProjectRelationAction,
+  getRelatedProjectsAction,
+  removeProjectRelationAction,
+} from '@/app/actions/project-actions';
+import type { Project } from '@/lib/types';
 import { Button } from './ui/button';
 import {
   DropdownMenu,

@@ -1,7 +1,7 @@
 'use client';
 
-import type { Project, ProjectStatus, Todo } from '@/lib/types';
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useState } from 'react';
+import type { Project, ProjectStatus, Todo } from '@/lib/types';
 import type { StorageProvider } from './storage-provider';
 
 export type ProjectActions = {

@@ -1,13 +1,13 @@
 'use client';
 
-import { useProjectsStore } from '@/context/projects-context';
-import type { Project } from '@/lib/types';
-import { cn } from '@/lib/utils';
 import { BoxSelect, Download, Sparkles, Upload } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React from 'react';
 import { toast } from 'sonner';
+import { useProjectsStore } from '@/context/projects-context';
+import type { Project } from '@/lib/types';
+import { cn } from '@/lib/utils';
 import { IdeaGeneratorDialog } from './idea-generator-dialog';
 import { PurgeDialog } from './purge-dialog';
 import { ThemeToggle } from './theme-toggle';

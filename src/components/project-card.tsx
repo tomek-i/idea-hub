@@ -1,3 +1,7 @@
+import { Archive, ArrowRight, Github, ListTodo, Trash2 } from 'lucide-react';
+import Link from 'next/link';
+import type React from 'react';
+import { toast } from 'sonner';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,10 +15,6 @@ import {
 } from '@/components/ui/alert-dialog';
 import type { ProjectActions } from '@/context/projects-context';
 import type { Project } from '@/lib/types';
-import { Archive, ArrowRight, Github, ListTodo, Trash2 } from 'lucide-react';
-import Link from 'next/link';
-import type React from 'react';
-import { toast } from 'sonner';
 import { Button } from './ui/button';
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
 

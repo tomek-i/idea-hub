@@ -1,5 +1,5 @@
-import { PrismaClient } from '@/generated/prisma/client';
 import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
+import { PrismaClient } from '@/generated/prisma/client';
 
 // Singleton pattern to prevent multiple instances in development
 const globalForPrisma = globalThis as unknown as {

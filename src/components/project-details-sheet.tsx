@@ -1,4 +1,8 @@
 'use client';
+import { Archive, ArchiveRestore, ArrowRight, ExternalLink, Github, Trash2 } from 'lucide-react';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,10 +23,6 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet';
 import type { Project, Todo } from '@/lib/types';
-import { Archive, ArchiveRestore, ArrowRight, ExternalLink, Github, Trash2 } from 'lucide-react';
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { toast } from 'sonner';
 import { ArchiveDialog } from './archive-dialog';
 import { NotesEditor } from './notes-editor';
 import { RelatedProjects } from './related-projects';

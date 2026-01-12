@@ -1,8 +1,8 @@
 'use client';
 
+import { useEffect, useRef, useState } from 'react';
 import { useProjectsStore } from '@/context/projects-context';
 import type { Project } from '@/lib/types';
-import { useEffect, useRef, useState } from 'react';
 import { ProjectColumn } from './project-column';
 import { ProjectDetailsSheet } from './project-details-sheet';
 import { Skeleton } from './ui/skeleton';

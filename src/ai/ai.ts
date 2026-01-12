@@ -1,6 +1,6 @@
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
-import { generateProjectIdeas } from './flows/generate-project-ideas';
 import { assistWithProjectNotes } from './flows/assist-with-project-notes';
+import { generateProjectIdeas } from './flows/generate-project-ideas';
 
 const openrouter = createOpenRouter({
   // TODO: get from env

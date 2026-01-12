@@ -1,4 +1,8 @@
 'use client';
+import { Loader, Plus, Sparkles } from 'lucide-react';
+import type React from 'react';
+import { useState } from 'react';
+import { toast } from 'sonner';
 import { ai } from '@/ai/ai';
 import {
   Dialog,
@@ -10,10 +14,6 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { useProjectsStore } from '@/context/projects-context';
-import { Loader, Plus, Sparkles } from 'lucide-react';
-import type React from 'react';
-import { useState } from 'react';
-import { toast } from 'sonner';
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
 import { Input } from './ui/input';

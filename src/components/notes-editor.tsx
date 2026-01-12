@@ -1,9 +1,9 @@
 'use client';
-import { ai } from '@/ai/ai';
-import type { Project } from '@/lib/types';
 import { Loader, NotebookText, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { ai } from '@/ai/ai';
+import type { Project } from '@/lib/types';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import {

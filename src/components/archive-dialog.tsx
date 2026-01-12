@@ -1,5 +1,8 @@
 'use client';
 
+import { Archive } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'sonner';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,9 +14,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Archive } from 'lucide-react';
-import { useState } from 'react';
-import { toast } from 'sonner';
 import { Button } from './ui/button';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
