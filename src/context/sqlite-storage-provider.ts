@@ -34,8 +34,12 @@ export class SqliteStorageProvider implements StorageProvider {
     return deleteProjectAction(projectId);
   }
 
-  async updateProjectStatus(projectId: string, status: ProjectStatus): Promise<Project> {
-    return updateProjectStatusAction(projectId, status);
+  async updateProjectStatus(
+    projectId: string,
+    status: ProjectStatus,
+    archiveNotes?: string | null
+  ): Promise<Project> {
+    return updateProjectStatusAction(projectId, status, archiveNotes);
   }
 
   async addTodo(projectId: string, todoText: string): Promise<Todo> {

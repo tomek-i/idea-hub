@@ -29,7 +29,7 @@ export class LocalStorageProvider implements StorageProvider {
   }
 
   async addProject(
-    newProject: Omit<Project, 'id' | 'todos' | 'githubUrl' | 'status'>
+    newProject: Omit<Project, 'id' | 'todos' | 'githubUrl' | 'status' | 'archiveNotes'>
   ): Promise<Project> {
     const projects = this.getStoredProjects();
     const project: Project = {
@@ -38,6 +38,7 @@ export class LocalStorageProvider implements StorageProvider {
       todos: [],
       githubUrl: null,
       status: 'draft',
+      archiveNotes: null,
     };
     projects.push(project);
     this.saveProjects(projects);
@@ -57,13 +58,22 @@ export class LocalStorageProvider implements StorageProvider {
     this.saveProjects(filtered);
   }
 
-  async updateProjectStatus(projectId: string, status: ProjectStatus): Promise<Project> {
+  async updateProjectStatus(
+    projectId: string,
+    status: ProjectStatus,
+    archiveNotes?: string | null
+  ): Promise<Project> {
     const projects = this.getStoredProjects();
     const project = projects.find((p) => p.id === projectId);
     if (!project) {
       throw new Error(`Project with id ${projectId} not found`);
     }
-    const updated = { ...project, status };
+    const updated = {
+      ...project,
+      status,
+      archiveNotes:
+        status === 'archived' && archiveNotes !== undefined ? archiveNotes : project.archiveNotes,
+    };
     const updatedProjects = projects.map((p) => (p.id === projectId ? updated : p));
     this.saveProjects(updatedProjects);
     return updated;

@@ -4,7 +4,7 @@ export interface Todo {
   completed: boolean;
 }
 
-export type ProjectStatus = 'draft' | 'refined';
+export type ProjectStatus = 'draft' | 'refined' | 'archived';
 
 export interface Project {
   id: string;
@@ -14,4 +14,5 @@ export interface Project {
   todos: Todo[];
   githubUrl: string | null;
   status: ProjectStatus;
+  archiveNotes: string | null;
 }

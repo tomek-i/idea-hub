@@ -19,10 +19,11 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet';
 import type { Project, Todo } from '@/lib/types';
-import { ArrowRight, ExternalLink, Github, Trash2 } from 'lucide-react';
+import { Archive, ArchiveRestore, ArrowRight, ExternalLink, Github, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import { ArchiveDialog } from './archive-dialog';
 import { NotesEditor } from './notes-editor';
 import { TodoList } from './todo-list';
 import { Button } from './ui/button';
@@ -36,7 +37,11 @@ interface ProjectDetailsSheetProps {
   onUpdateProject: (project: Project) => void;
   projectActions: {
     deleteProject: (projectId: string) => void;
-    updateProjectStatus: (projectId: string, status: 'refined') => void;
+    updateProjectStatus: (
+      projectId: string,
+      status: 'refined' | 'archived' | 'draft',
+      archiveNotes?: string | null
+    ) => void;
     addTodo: (projectId: string, todoText: string) => void;
     updateTodo: (projectId: string, updatedTodo: Todo) => void;
     deleteTodo: (projectId: string, todoId: string) => void;
@@ -74,6 +79,18 @@ export function ProjectDetailsSheet({
     toast.success(`"${localProject.name}" has been moved to Refined Projects.`);
   };
 
+  const handleArchive = (archiveNotes: string) => {
+    projectActions.updateProjectStatus(localProject.id, 'archived', archiveNotes || null);
+    onOpenChange(false);
+  };
+
+  const handleUnarchive = () => {
+    // Restore to draft by default (user can move to refined if needed)
+    projectActions.updateProjectStatus(localProject.id, 'draft', null);
+    onOpenChange(false);
+    toast.success(`"${localProject.name}" has been unarchived and moved to Drafts.`);
+  };
+
   const handleDelete = () => {
     projectActions.deleteProject(localProject.id);
     onOpenChange(false);
@@ -91,7 +108,11 @@ export function ProjectDetailsSheet({
         <SheetHeader>
           <SheetTitle className="font-headline text-2xl">{localProject.name}</SheetTitle>
           <SheetDescription>
-            {localProject.status === 'draft' ? 'Draft Idea' : 'Refined Project'}
+            {localProject.status === 'draft'
+              ? 'Draft Idea'
+              : localProject.status === 'refined'
+                ? 'Refined Project'
+                : 'Archived Project'}
           </SheetDescription>
         </SheetHeader>
         <div className="flex-1 overflow-y-auto px-6 space-y-6">
@@ -116,6 +137,17 @@ export function ProjectDetailsSheet({
           </div>
 
           <NotesEditor project={localProject} onUpdateProject={handleUpdateProjectFromNotes} />
+
+          {localProject.status === 'archived' && localProject.archiveNotes && (
+            <div className="space-y-2 p-4 bg-muted rounded-lg border">
+              <Label className="text-sm font-semibold flex items-center gap-2">
+                <Archive className="w-4 h-4" /> Archive Notes
+              </Label>
+              <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                {localProject.archiveNotes}
+              </p>
+            </div>
+          )}
 
           <TodoList project={localProject} projectActions={projectActions} />
 
@@ -172,11 +204,22 @@ export function ProjectDetailsSheet({
               </AlertDialogContent>
             </AlertDialog>
 
-            {localProject.status === 'draft' && (
-              <Button onClick={handleMoveToRefined}>
-                Move to Refined <ArrowRight className="ml-2" />
-              </Button>
-            )}
+            <div className="flex gap-2">
+              {localProject.status === 'archived' ? (
+                <Button onClick={handleUnarchive} variant="outline">
+                  <ArchiveRestore className="mr-2 h-4 w-4" /> Unarchive
+                </Button>
+              ) : (
+                <>
+                  {localProject.status === 'draft' && (
+                    <Button onClick={handleMoveToRefined}>
+                      Move to Refined <ArrowRight className="ml-2" />
+                    </Button>
+                  )}
+                  <ArchiveDialog projectName={localProject.name} onArchive={handleArchive} />
+                </>
+              )}
+            </div>
           </div>
         </SheetFooter>
       </SheetContent>

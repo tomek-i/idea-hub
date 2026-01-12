@@ -14,6 +14,7 @@ export function ProjectBoard() {
 
   const draftProjects = projects.filter((p) => p.status === 'draft');
   const refinedProjects = projects.filter((p) => p.status === 'refined');
+  const archivedProjects = projects.filter((p) => p.status === 'archived');
 
   // Sync editingProject with the latest version from the global store
   useEffect(() => {
@@ -46,11 +47,17 @@ export function ProjectBoard() {
 
   if (!isLoaded) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <div>
           <Skeleton className="h-10 w-48 mb-4" />
           <div className="space-y-4">
             <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+          </div>
+        </div>
+        <div>
+          <Skeleton className="h-10 w-48 mb-4" />
+          <div className="space-y-4">
             <Skeleton className="h-24 w-full" />
           </div>
         </div>
@@ -66,7 +73,7 @@ export function ProjectBoard() {
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 items-start">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 items-start">
         <ProjectColumn
           title="Drafts"
           projects={draftProjects}
@@ -80,6 +87,13 @@ export function ProjectBoard() {
           onSelectProject={handleSelectProject}
           projectActions={projectActions}
           status="refined"
+        />
+        <ProjectColumn
+          title="Archived"
+          projects={archivedProjects}
+          onSelectProject={handleSelectProject}
+          projectActions={projectActions}
+          status="archived"
         />
       </div>
       <ProjectDetailsSheet

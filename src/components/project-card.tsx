@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import type { ProjectActions } from '@/context/projects-context';
 import type { Project } from '@/lib/types';
-import { ArrowRight, Github, ListTodo, Trash2 } from 'lucide-react';
+import { Archive, ArrowRight, Github, ListTodo, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import type React from 'react';
 import { toast } from 'sonner';
@@ -56,6 +56,19 @@ export function ProjectCard({ project, onSelectProject, projectActions }: Projec
           <CardDescription className="pt-2 whitespace-pre-wrap wrap-break-word">
             {project.description || 'No description provided.'}
           </CardDescription>
+          {project.status === 'archived' && project.archiveNotes && (
+            <div className="mt-3 pt-3 border-t border-border/50">
+              <div className="flex items-start gap-2">
+                <Archive className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="text-xs font-medium text-muted-foreground mb-1">Archive Notes</p>
+                  <p className="text-sm text-muted-foreground whitespace-pre-wrap wrap-break-word">
+                    {project.archiveNotes}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </CardHeader>
       </Button>
       <CardFooter className="flex justify-between items-center text-sm text-muted-foreground mt-auto">

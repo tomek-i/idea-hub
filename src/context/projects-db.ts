@@ -22,12 +22,13 @@ export async function updateProject(
     notes: string;
     status: ProjectStatus;
     githubUrl: string;
+    archiveNotes: string | null;
   }>
 ) {
   // If status is present, ensure it is the correct enum type
   const fixedData = { ...data };
   if (fixedData.status && typeof fixedData.status === 'string') {
-    if (['draft', 'refined'].includes(fixedData.status)) {
+    if (['draft', 'refined', 'archived'].includes(fixedData.status)) {
       fixedData.status = fixedData.status as ProjectStatus;
     } else {
       delete fixedData.status;
@@ -86,6 +87,7 @@ export async function importProjects(projects: any[]) {
         notes: projectData.notes,
         githubUrl: projectData.githubUrl,
         status: projectData.status,
+        archiveNotes: projectData.archiveNotes || null,
       },
     });
 

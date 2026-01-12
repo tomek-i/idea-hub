@@ -90,6 +90,15 @@ export function Header() {
           >
             Drafts
           </Link>
+          <Link
+            href="/archived"
+            className={cn(
+              'text-sm font-medium transition-colors hover:text-primary',
+              pathname === '/archived' ? 'text-primary' : 'text-muted-foreground'
+            )}
+          >
+            Archived
+          </Link>
         </nav>
       </div>
       <div className="flex items-center gap-2">

@@ -23,6 +23,7 @@ export async function getAllProjectsAction(): Promise<Project[]> {
     notes: p.notes,
     githubUrl: p.githubUrl,
     status: p.status as ProjectStatus,
+    archiveNotes: p.archiveNotes,
     todos: p.todos.map((t) => ({
       id: t.id,
       text: t.text,
@@ -32,7 +33,7 @@ export async function getAllProjectsAction(): Promise<Project[]> {
 }
 
 export async function addProjectAction(
-  newProject: Omit<Project, 'id' | 'todos' | 'githubUrl' | 'status'>
+  newProject: Omit<Project, 'id' | 'todos' | 'githubUrl' | 'status' | 'archiveNotes'>
 ): Promise<Project> {
   const dbProject = await dbAddProject({
     name: newProject.name,
@@ -46,6 +47,7 @@ export async function addProjectAction(
     notes: dbProject.notes,
     githubUrl: dbProject.githubUrl,
     status: dbProject.status as ProjectStatus,
+    archiveNotes: dbProject.archiveNotes,
     todos: [],
   };
 }
@@ -57,6 +59,7 @@ export async function updateProjectAction(updatedProject: Project): Promise<Proj
     notes: updatedProject.notes,
     status: updatedProject.status,
     githubUrl: updatedProject.githubUrl || undefined,
+    archiveNotes: updatedProject.archiveNotes || undefined,
   });
   const dbProjectWithTodos = await getAllProjects();
   const fullProject = dbProjectWithTodos.find((p) => p.id === updatedProject.id);
@@ -70,6 +73,7 @@ export async function updateProjectAction(updatedProject: Project): Promise<Proj
     notes: fullProject.notes,
     githubUrl: fullProject.githubUrl,
     status: fullProject.status as ProjectStatus,
+    archiveNotes: fullProject.archiveNotes,
     todos: fullProject.todos.map((t) => ({
       id: t.id,
       text: t.text,
@@ -84,9 +88,14 @@ export async function deleteProjectAction(projectId: string): Promise<void> {
 
 export async function updateProjectStatusAction(
   projectId: string,
-  status: ProjectStatus
+  status: ProjectStatus,
+  archiveNotes?: string | null
 ): Promise<Project> {
-  const dbProject = await dbUpdateProject(projectId, { status });
+  const updateData: { status: ProjectStatus; archiveNotes?: string | null } = { status };
+  if (status === 'archived' && archiveNotes !== undefined) {
+    updateData.archiveNotes = archiveNotes;
+  }
+  const dbProject = await dbUpdateProject(projectId, updateData);
   const dbProjectWithTodos = await getAllProjects();
   const fullProject = dbProjectWithTodos.find((p) => p.id === projectId);
   if (!fullProject) {
@@ -99,6 +108,7 @@ export async function updateProjectStatusAction(
     notes: fullProject.notes,
     githubUrl: fullProject.githubUrl,
     status: fullProject.status as ProjectStatus,
+    archiveNotes: fullProject.archiveNotes,
     todos: fullProject.todos.map((t) => ({
       id: t.id,
       text: t.text,

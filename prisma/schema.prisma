@@ -14,13 +14,14 @@ datasource db {
 }
 
 model Project {
-  id          String        @id @default(uuid())
-  name        String
-  description String
-  notes       String
-  todos       Todo[]
-  githubUrl   String? // nullable
-  status      ProjectStatus
+  id           String        @id @default(uuid())
+  name         String
+  description  String
+  notes        String
+  todos        Todo[]
+  githubUrl    String? // nullable
+  status       ProjectStatus
+  archiveNotes String? // nullable - notes about why the project was archived
 }
 
 model Todo {
@@ -34,4 +35,5 @@ model Todo {
 enum ProjectStatus {
   draft
   refined
+  archived
 }

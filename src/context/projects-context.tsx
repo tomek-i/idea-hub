@@ -5,10 +5,16 @@ import { createContext, type ReactNode, useCallback, useContext, useEffect, useS
 import type { StorageProvider } from './storage-provider';
 
 export type ProjectActions = {
-  addProject: (newProject: Omit<Project, 'id' | 'todos' | 'githubUrl' | 'status'>) => void;
+  addProject: (
+    newProject: Omit<Project, 'id' | 'todos' | 'githubUrl' | 'status' | 'archiveNotes'>
+  ) => void;
   updateProject: (updatedProject: Project) => void;
   deleteProject: (projectId: string) => void;
-  updateProjectStatus: (projectId: string, status: ProjectStatus) => void;
+  updateProjectStatus: (
+    projectId: string,
+    status: ProjectStatus,
+    archiveNotes?: string | null
+  ) => void;
   addTodo: (projectId: string, todoText: string) => void;
   updateTodo: (projectId: string, updatedTodo: Todo) => void;
   deleteTodo: (projectId: string, todoId: string) => void;
@@ -49,7 +55,7 @@ export function ProjectsProvider({ children, storageProvider }: ProjectsProvider
   }, [storageProvider]);
 
   const addProject = useCallback(
-    async (newProject: Omit<Project, 'id' | 'todos' | 'githubUrl' | 'status'>) => {
+    async (newProject: Omit<Project, 'id' | 'todos' | 'githubUrl' | 'status' | 'archiveNotes'>) => {
       try {
         const created = await storageProvider.addProject(newProject);
         setProjects((prev) => [...prev, created]);
@@ -88,9 +94,9 @@ export function ProjectsProvider({ children, storageProvider }: ProjectsProvider
   );
 
   const updateProjectStatus = useCallback(
-    async (projectId: string, status: ProjectStatus) => {
+    async (projectId: string, status: ProjectStatus, archiveNotes?: string | null) => {
       try {
-        const updated = await storageProvider.updateProjectStatus(projectId, status);
+        const updated = await storageProvider.updateProjectStatus(projectId, status, archiveNotes);
         setProjects((prev) => prev.map((p) => (p.id === projectId ? updated : p)));
       } catch (error) {
         console.error('Failed to update project status', error);
