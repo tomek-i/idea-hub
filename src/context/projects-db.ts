@@ -1,8 +1,57 @@
 import type { ProjectStatus } from '@/generated/prisma/enums';
 import { prisma } from '@/lib/prisma';
 
-export async function getAllProjects() {
+export async function getAllProjects(includeRelated = false) {
+  if (includeRelated) {
+    return prisma.project.findMany({
+      include: {
+        todos: true,
+        relatedTo: {
+          include: {
+            to: {
+              include: { todos: true },
+            },
+          },
+        },
+      },
+    });
+  }
   return prisma.project.findMany({ include: { todos: true } });
+}
+
+export async function getRelatedProjects(projectId: string) {
+  const relations = await prisma.projectRelation.findMany({
+    where: { fromId: projectId },
+    include: {
+      to: {
+        include: { todos: true },
+      },
+    },
+  });
+  return relations.map((r) => r.to);
+}
+
+export async function addProjectRelation(fromId: string, toId: string) {
+  // Prevent self-relation
+  if (fromId === toId) {
+    throw new Error('A project cannot be related to itself');
+  }
+  // Check if relation already exists
+  const existing = await prisma.projectRelation.findUnique({
+    where: { fromId_toId: { fromId, toId } },
+  });
+  if (existing) {
+    throw new Error('This relation already exists');
+  }
+  return prisma.projectRelation.create({
+    data: { fromId, toId },
+  });
+}
+
+export async function removeProjectRelation(fromId: string, toId: string) {
+  return prisma.projectRelation.delete({
+    where: { fromId_toId: { fromId, toId } },
+  });
 }
 
 export async function addProject(data: { name: string; description: string; notes: string }) {
@@ -72,7 +121,22 @@ export async function purgeAllProjects() {
   await prisma.project.deleteMany({});
 }
 
-export async function importProjects(projects: any[]) {
+interface ImportProject {
+  id: string;
+  name: string;
+  description: string;
+  notes: string;
+  githubUrl: string | null;
+  status: ProjectStatus;
+  archiveNotes: string | null;
+  todos?: Array<{
+    id: string;
+    text: string;
+    completed: boolean;
+  }>;
+}
+
+export async function importProjects(projects: ImportProject[]) {
   // First purge all existing data
   await purgeAllProjects();
 
@@ -94,7 +158,7 @@ export async function importProjects(projects: any[]) {
     // Create todos for this project
     if (todos && todos.length > 0) {
       await prisma.todo.createMany({
-        data: todos.map((todo: any) => ({
+        data: todos.map((todo) => ({
           id: todo.id,
           text: todo.text,
           completed: todo.completed,

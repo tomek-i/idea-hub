@@ -50,10 +50,12 @@ export default function DraftsPage() {
       </div>
       <ProjectDetailsSheet
         project={editingProject}
+        allProjects={projects}
         onOpenChange={(isOpen) => {
           if (!isOpen) setEditingProject(null);
         }}
         onUpdateProject={handleUpdateProject}
+        onProjectSelect={handleSelectProject}
         projectActions={projectActions}
       />
     </>

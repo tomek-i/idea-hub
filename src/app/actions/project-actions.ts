@@ -2,11 +2,14 @@
 
 import {
   addProject as dbAddProject,
+  addProjectRelation as dbAddProjectRelation,
   addTodo as dbAddTodo,
   deleteProject as dbDeleteProject,
   deleteTodo as dbDeleteTodo,
+  getRelatedProjects as dbGetRelatedProjects,
   importProjects as dbImportProjects,
   purgeAllProjects as dbPurgeAllProjects,
+  removeProjectRelation as dbRemoveProjectRelation,
   updateProject as dbUpdateProject,
   updateTodo as dbUpdateTodo,
   getAllProjects,
@@ -53,7 +56,7 @@ export async function addProjectAction(
 }
 
 export async function updateProjectAction(updatedProject: Project): Promise<Project> {
-  const dbProject = await dbUpdateProject(updatedProject.id, {
+  await dbUpdateProject(updatedProject.id, {
     name: updatedProject.name,
     description: updatedProject.description,
     notes: updatedProject.notes,
@@ -95,7 +98,7 @@ export async function updateProjectStatusAction(
   if (status === 'archived' && archiveNotes !== undefined) {
     updateData.archiveNotes = archiveNotes;
   }
-  const dbProject = await dbUpdateProject(projectId, updateData);
+  await dbUpdateProject(projectId, updateData);
   const dbProjectWithTodos = await getAllProjects();
   const fullProject = dbProjectWithTodos.find((p) => p.id === projectId);
   if (!fullProject) {
@@ -126,7 +129,7 @@ export async function addTodoAction(projectId: string, todoText: string): Promis
   };
 }
 
-export async function updateTodoAction(projectId: string, updatedTodo: Todo): Promise<Todo> {
+export async function updateTodoAction(_projectId: string, updatedTodo: Todo): Promise<Todo> {
   await dbUpdateTodo(updatedTodo.id, {
     text: updatedTodo.text,
     completed: updatedTodo.completed,
@@ -134,7 +137,7 @@ export async function updateTodoAction(projectId: string, updatedTodo: Todo): Pr
   return updatedTodo;
 }
 
-export async function deleteTodoAction(projectId: string, todoId: string): Promise<void> {
+export async function deleteTodoAction(_projectId: string, todoId: string): Promise<void> {
   await dbDeleteTodo(todoId);
 }
 
@@ -144,4 +147,30 @@ export async function purgeAllProjectsAction(): Promise<void> {
 
 export async function importProjectsAction(projects: Project[]): Promise<void> {
   await dbImportProjects(projects);
+}
+
+export async function getRelatedProjectsAction(projectId: string): Promise<Project[]> {
+  const dbProjects = await dbGetRelatedProjects(projectId);
+  return dbProjects.map((p) => ({
+    id: p.id,
+    name: p.name,
+    description: p.description,
+    notes: p.notes,
+    githubUrl: p.githubUrl,
+    status: p.status as ProjectStatus,
+    archiveNotes: p.archiveNotes,
+    todos: p.todos.map((t) => ({
+      id: t.id,
+      text: t.text,
+      completed: t.completed,
+    })),
+  }));
+}
+
+export async function addProjectRelationAction(fromId: string, toId: string): Promise<void> {
+  await dbAddProjectRelation(fromId, toId);
+}
+
+export async function removeProjectRelationAction(fromId: string, toId: string): Promise<void> {
+  await dbRemoveProjectRelation(fromId, toId);
 }

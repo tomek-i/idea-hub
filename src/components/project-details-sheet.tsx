@@ -25,6 +25,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { ArchiveDialog } from './archive-dialog';
 import { NotesEditor } from './notes-editor';
+import { RelatedProjects } from './related-projects';
 import { TodoList } from './todo-list';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -33,8 +34,10 @@ import { Textarea } from './ui/textarea';
 
 interface ProjectDetailsSheetProps {
   project: Project | null;
+  allProjects?: Project[]; // Optional - if not provided, RelatedProjects won't work
   onOpenChange: (isOpen: boolean) => void;
   onUpdateProject: (project: Project) => void;
+  onProjectSelect?: (project: Project) => void; // Optional - for navigating to related projects
   projectActions: {
     deleteProject: (projectId: string) => void;
     updateProjectStatus: (
@@ -50,8 +53,10 @@ interface ProjectDetailsSheetProps {
 
 export function ProjectDetailsSheet({
   project,
+  allProjects = [],
   onOpenChange,
   onUpdateProject,
+  onProjectSelect,
   projectActions,
 }: ProjectDetailsSheetProps) {
   const [localProject, setLocalProject] = useState<Project | null>(project);
@@ -151,35 +156,44 @@ export function ProjectDetailsSheet({
 
           <TodoList project={localProject} projectActions={projectActions} />
 
-          {localProject.status === 'refined' && (
-            <div className="space-y-2">
-              <Label htmlFor="githubUrl">
-                <div className="flex items-center gap-2">
-                  <Github className="w-4 h-4" /> GitHub Repository
-                </div>
-              </Label>
-              <div className="flex items-center gap-2">
-                <Input
-                  id={githubUrlId}
-                  value={localProject.githubUrl || ''}
-                  onChange={(e) => handleFieldChange('githubUrl', e.target.value)}
-                  placeholder="https://github.com/user/repo"
-                />
-                {localProject.githubUrl && (
-                  <Button asChild variant="outline" size="icon">
-                    <Link
-                      href={localProject.githubUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="Open GitHub repository in new tab"
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                    </Link>
-                  </Button>
-                )}
-              </div>
-            </div>
+          {allProjects.length > 0 && (
+            <RelatedProjects
+              project={localProject}
+              allProjects={allProjects}
+              onProjectSelect={(relatedProject) => {
+                onProjectSelect?.(relatedProject);
+                onOpenChange(false);
+              }}
+            />
           )}
+
+          <div className="space-y-2">
+            <Label htmlFor="githubUrl">
+              <div className="flex items-center gap-2">
+                <Github className="w-4 h-4" /> GitHub Repository
+              </div>
+            </Label>
+            <div className="flex items-center gap-2">
+              <Input
+                id={githubUrlId}
+                value={localProject.githubUrl || ''}
+                onChange={(e) => handleFieldChange('githubUrl', e.target.value)}
+                placeholder="https://github.com/user/repo"
+              />
+              {localProject.githubUrl && (
+                <Button asChild variant="outline" size="icon">
+                  <Link
+                    href={localProject.githubUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Open GitHub repository in new tab"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                  </Link>
+                </Button>
+              )}
+            </div>
+          </div>
         </div>
         <SheetFooter className="mt-auto pt-4 border-t">
           <div className="flex justify-between w-full">

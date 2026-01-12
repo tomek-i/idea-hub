@@ -9,18 +9,14 @@ const openrouter = createOpenRouter({
 // TODO: get from env perhaps?
 const model = openrouter.chat('anthropic/claude-3.5-sonnet');
 
-
-
 export const ai = {
   generateProjectIdeas: async (description: string) => {
-    return await generateProjectIdeas(
-      { description },model
-      
-    );
+    return await generateProjectIdeas({ description }, model);
   },
   generateProjectNotes: async (description: string, notes: string) => {
     return await assistWithProjectNotes(
-      { projectDescription: description, projectNotes: notes },model
+      { projectDescription: description, projectNotes: notes },
+      model
     );
-  }
-}
+  },
+};

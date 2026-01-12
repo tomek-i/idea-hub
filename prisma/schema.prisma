@@ -14,7 +14,7 @@ datasource db {
 }
 
 model Project {
-  id           String        @id @default(uuid())
+  id           String            @id @default(uuid())
   name         String
   description  String
   notes        String
@@ -22,6 +22,8 @@ model Project {
   githubUrl    String? // nullable
   status       ProjectStatus
   archiveNotes String? // nullable - notes about why the project was archived
+  relatedFrom  ProjectRelation[] @relation("ProjectFrom")
+  relatedTo    ProjectRelation[] @relation("ProjectTo")
 }
 
 model Todo {
@@ -30,6 +32,19 @@ model Todo {
   completed Boolean
   project   Project @relation(fields: [projectId], references: [id])
   projectId String
+}
+
+model ProjectRelation {
+  id        String   @id @default(uuid())
+  fromId    String
+  toId      String
+  from      Project  @relation("ProjectFrom", fields: [fromId], references: [id], onDelete: Cascade)
+  to        Project  @relation("ProjectTo", fields: [toId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([fromId, toId])
+  @@index([fromId])
+  @@index([toId])
 }
 
 enum ProjectStatus {

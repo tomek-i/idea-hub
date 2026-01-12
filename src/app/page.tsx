@@ -56,10 +56,12 @@ export default function Home() {
       </div>
       <ProjectDetailsSheet
         project={editingProject}
+        allProjects={projects}
         onOpenChange={(isOpen) => {
           if (!isOpen) setEditingProject(null);
         }}
         onUpdateProject={handleUpdateProject}
+        onProjectSelect={handleSelectProject}
         projectActions={projectActions}
       />
     </>
