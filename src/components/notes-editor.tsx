@@ -1,9 +1,9 @@
 'use client';
+import { ai } from '@/ai/ai';
+import type { Project } from '@/lib/types';
 import { Loader, NotebookText, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { assistWithProjectNotes } from '@/ai/flows/assist-with-project-notes';
-import type { Project } from '@/lib/types';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import {
@@ -31,10 +31,7 @@ export function NotesEditor({ project, onUpdateProject }: NotesEditorProps) {
     setIsLoading(true);
     setIsDialogOpen(true);
     try {
-      const result = await assistWithProjectNotes({
-        projectDescription: project.description,
-        projectNotes: project.notes,
-      });
+      const result = await ai.generateProjectNotes(project.description, project.notes);
       setSuggestion(result.improvedNotes);
     } catch (error) {
       console.error('AI assistant failed:', error);

@@ -1,9 +1,9 @@
+import { ThemeProvider } from '@/components/theme-provider';
+import { Toaster } from '@/components/ui/sonner';
+import { ProjectsProviderWrapper } from '@/context/projects-provider-wrapper';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { ThemeProvider } from '@/components/theme-provider';
-import { Toaster } from '@/components/ui/sonner';
-import { ProjectsProvider } from '@/context/projects-context';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
@@ -34,10 +34,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <ProjectsProvider>
+          <ProjectsProviderWrapper>
             {children}
             <Toaster />
-          </ProjectsProvider>
+          </ProjectsProviderWrapper>
         </ThemeProvider>
       </body>
     </html>

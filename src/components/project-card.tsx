@@ -1,7 +1,3 @@
-import { ArrowRight, Github, ListTodo, Trash2 } from 'lucide-react';
-import Link from 'next/link';
-import type React from 'react';
-import { toast } from 'sonner';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,6 +11,10 @@ import {
 } from '@/components/ui/alert-dialog';
 import type { ProjectActions } from '@/context/projects-context';
 import type { Project } from '@/lib/types';
+import { ArrowRight, Github, ListTodo, Trash2 } from 'lucide-react';
+import Link from 'next/link';
+import type React from 'react';
+import { toast } from 'sonner';
 import { Button } from './ui/button';
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
 
@@ -48,12 +48,12 @@ export function ProjectCard({ project, onSelectProject, projectActions }: Projec
       <Button
         variant="ghost"
         onClick={() => onSelectProject(project)}
-        className="cursor-pointer flex-grow h-auto p-0 hover:bg-transparent focus:bg-transparent"
+        className="cursor-pointer grow h-auto p-0 hover:bg-transparent focus:bg-transparent"
         aria-label={`View details for ${project.name}`}
       >
         <CardHeader className="w-full">
           <CardTitle className="font-headline">{project.name}</CardTitle>
-          <CardDescription className="pt-2 line-clamp-2 min-h-[40px]">
+          <CardDescription className="pt-2 whitespace-pre-wrap wrap-break-word">
             {project.description || 'No description provided.'}
           </CardDescription>
         </CardHeader>

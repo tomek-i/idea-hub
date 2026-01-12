@@ -1,9 +1,5 @@
 'use client';
-import { Loader, Plus, Sparkles } from 'lucide-react';
-import type React from 'react';
-import { useState } from 'react';
-import { toast } from 'sonner';
-import { generateProjectIdeas } from '@/ai/flows/generate-project-ideas';
+import { ai } from '@/ai/ai';
 import {
   Dialog,
   DialogContent,
@@ -14,6 +10,10 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { useProjectsStore } from '@/context/projects-context';
+import { Loader, Plus, Sparkles } from 'lucide-react';
+import type React from 'react';
+import { useState } from 'react';
+import { toast } from 'sonner';
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
 import { Input } from './ui/input';
@@ -31,7 +31,7 @@ export function IdeaGeneratorDialog({ children }: { children: React.ReactNode })
     setIsLoading(true);
     setIdeas([]);
     try {
-      const result = await generateProjectIdeas({ description: keywords });
+      const result = await ai.generateProjectIdeas(keywords);
       setIdeas(result.ideas);
     } catch (error) {
       console.error('Failed to generate ideas:', error);

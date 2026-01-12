@@ -1,9 +1,8 @@
 'use client';
 
-import { createContext, type ReactNode, useCallback, useContext, useEffect, useState } from 'react';
 import type { Project, ProjectStatus, Todo } from '@/lib/types';
-
-const STORE_KEY = 'project-hub-projects';
+import { createContext, type ReactNode, useCallback, useContext, useEffect, useState } from 'react';
+import type { StorageProvider } from './storage-provider';
 
 export type ProjectActions = {
   addProject: (newProject: Omit<Project, 'id' | 'todos' | 'githubUrl' | 'status'>) => void;
@@ -24,102 +23,164 @@ type ProjectsContextType = {
 
 const ProjectsContext = createContext<ProjectsContextType | undefined>(undefined);
 
-export function ProjectsProvider({ children }: { children: ReactNode }) {
+interface ProjectsProviderProps {
+  children: ReactNode;
+  storageProvider: StorageProvider;
+}
+
+export function ProjectsProvider({ children, storageProvider }: ProjectsProviderProps) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
+  // Load projects on mount
   useEffect(() => {
-    try {
-      const storedProjects = localStorage.getItem(STORE_KEY);
-      if (storedProjects) {
-        setProjects(JSON.parse(storedProjects));
-      } else {
-        setProjects([]);
-      }
-    } catch (error) {
-      console.error('Failed to load projects from localStorage', error);
-      setProjects([]);
-    }
-    setIsLoaded(true);
-  }, []);
-
-  useEffect(() => {
-    if (isLoaded) {
+    const loadProjects = async () => {
       try {
-        localStorage.setItem(STORE_KEY, JSON.stringify(projects));
+        const loadedProjects = await storageProvider.getAllProjects();
+        setProjects(loadedProjects);
       } catch (error) {
-        console.error('Failed to save projects to localStorage', error);
+        console.error('Failed to load projects', error);
+        setProjects([]);
+      } finally {
+        setIsLoaded(true);
       }
-    }
-  }, [projects, isLoaded]);
+    };
+    loadProjects();
+  }, [storageProvider]);
 
   const addProject = useCallback(
-    (newProject: Omit<Project, 'id' | 'todos' | 'githubUrl' | 'status'>) => {
-      setProjects((prev) => [
-        ...prev,
-        {
-          ...newProject,
-          id: new Date().toISOString(),
-          todos: [],
-          githubUrl: null,
-          status: 'draft',
-        },
-      ]);
+    async (newProject: Omit<Project, 'id' | 'todos' | 'githubUrl' | 'status'>) => {
+      try {
+        const created = await storageProvider.addProject(newProject);
+        setProjects((prev) => [...prev, created]);
+      } catch (error) {
+        console.error('Failed to add project', error);
+        throw error;
+      }
     },
-    []
+    [storageProvider]
   );
 
-  const updateProject = useCallback((updatedProject: Project) => {
-    setProjects((prev) => prev.map((p) => (p.id === updatedProject.id ? updatedProject : p)));
-  }, []);
+  const updateProject = useCallback(
+    async (updatedProject: Project) => {
+      try {
+        const updated = await storageProvider.updateProject(updatedProject);
+        setProjects((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
+      } catch (error) {
+        console.error('Failed to update project', error);
+        throw error;
+      }
+    },
+    [storageProvider]
+  );
 
-  const deleteProject = useCallback((projectId: string) => {
-    setProjects((prev) => prev.filter((p) => p.id !== projectId));
-  }, []);
+  const deleteProject = useCallback(
+    async (projectId: string) => {
+      try {
+        await storageProvider.deleteProject(projectId);
+        setProjects((prev) => prev.filter((p) => p.id !== projectId));
+      } catch (error) {
+        console.error('Failed to delete project', error);
+        throw error;
+      }
+    },
+    [storageProvider]
+  );
 
-  const updateProjectStatus = useCallback((projectId: string, status: ProjectStatus) => {
-    setProjects((prev) => prev.map((p) => (p.id === projectId ? { ...p, status } : p)));
-  }, []);
+  const updateProjectStatus = useCallback(
+    async (projectId: string, status: ProjectStatus) => {
+      try {
+        const updated = await storageProvider.updateProjectStatus(projectId, status);
+        setProjects((prev) => prev.map((p) => (p.id === projectId ? updated : p)));
+      } catch (error) {
+        console.error('Failed to update project status', error);
+        throw error;
+      }
+    },
+    [storageProvider]
+  );
 
-  const addTodo = useCallback((projectId: string, todoText: string) => {
-    const newTodo: Todo = {
-      id: new Date().toISOString(),
-      text: todoText,
-      completed: false,
-    };
-    setProjects((prev) =>
-      prev.map((p) => (p.id === projectId ? { ...p, todos: [...p.todos, newTodo] } : p))
-    );
-  }, []);
+  const addTodo = useCallback(
+    async (projectId: string, todoText: string) => {
+      try {
+        const newTodo = await storageProvider.addTodo(projectId, todoText);
+        setProjects((prev) =>
+          prev.map((p) => (p.id === projectId ? { ...p, todos: [...p.todos, newTodo] } : p))
+        );
+      } catch (error) {
+        console.error('Failed to add todo', error);
+        throw error;
+      }
+    },
+    [storageProvider]
+  );
 
-  const updateTodo = useCallback((projectId: string, updatedTodo: Todo) => {
-    setProjects((prev) =>
-      prev.map((p) =>
-        p.id === projectId
-          ? {
-              ...p,
-              todos: p.todos.map((t) => (t.id === updatedTodo.id ? updatedTodo : t)),
-            }
-          : p
-      )
-    );
-  }, []);
+  const updateTodo = useCallback(
+    async (projectId: string, updatedTodo: Todo) => {
+      try {
+        const updated = await storageProvider.updateTodo(projectId, updatedTodo);
+        setProjects((prev) =>
+          prev.map((p) =>
+            p.id === projectId
+              ? {
+                  ...p,
+                  todos: p.todos.map((t) => (t.id === updated.id ? updated : t)),
+                }
+              : p
+          )
+        );
+      } catch (error) {
+        console.error('Failed to update todo', error);
+        throw error;
+      }
+    },
+    [storageProvider]
+  );
 
-  const deleteTodo = useCallback((projectId: string, todoId: string) => {
-    setProjects((prev) =>
-      prev.map((p) =>
-        p.id === projectId ? { ...p, todos: p.todos.filter((t) => t.id !== todoId) } : p
-      )
-    );
-  }, []);
+  const deleteTodo = useCallback(
+    async (projectId: string, todoId: string) => {
+      try {
+        await storageProvider.deleteTodo(projectId, todoId);
+        setProjects((prev) =>
+          prev.map((p) =>
+            p.id === projectId ? { ...p, todos: p.todos.filter((t) => t.id !== todoId) } : p
+          )
+        );
+      } catch (error) {
+        console.error('Failed to delete todo', error);
+        throw error;
+      }
+    },
+    [storageProvider]
+  );
 
-  const setAllProjects = useCallback((newProjects: Project[]) => {
-    setProjects(newProjects);
-  }, []);
+  const setAllProjects = useCallback(
+    async (newProjects: Project[]) => {
+      try {
+        // Purge all existing projects first
+        await storageProvider.purgeAllProjects();
+        // Then import the new projects
+        await storageProvider.importProjects(newProjects);
+        // Reload projects from storage
+        const loadedProjects = await storageProvider.getAllProjects();
+        setProjects(loadedProjects);
+      } catch (error) {
+        console.error('Failed to import projects', error);
+        throw error;
+      }
+    },
+    [storageProvider]
+  );
 
-  const purgeAllProjects = useCallback(() => {
-    setProjects([]);
-  }, []);
+  const purgeAllProjects = useCallback(async () => {
+    try {
+      await storageProvider.purgeAllProjects();
+      setProjects([]);
+    } catch (error) {
+      console.error('Failed to purge projects', error);
+      throw error;
+    }
+  }, [storageProvider]);
 
   const value = {
     projects,

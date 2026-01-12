@@ -1,13 +1,13 @@
 'use client';
 
+import { useProjectsStore } from '@/context/projects-context';
+import type { Project } from '@/lib/types';
+import { cn } from '@/lib/utils';
 import { BoxSelect, Download, Sparkles, Upload } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React from 'react';
 import { toast } from 'sonner';
-import { useProjectsStore } from '@/context/projects-context';
-import type { Project } from '@/lib/types';
-import { cn } from '@/lib/utils';
 import { IdeaGeneratorDialog } from './idea-generator-dialog';
 import { PurgeDialog } from './purge-dialog';
 import { ThemeToggle } from './theme-toggle';
@@ -40,16 +40,16 @@ export function Header() {
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = async (e) => {
         try {
           const content = e.target?.result;
           if (typeof content === 'string') {
             const importedProjects = JSON.parse(content) as Project[];
-            setAllProjects(importedProjects);
+            await setAllProjects(importedProjects);
             toast.success('Your projects have been restored.');
           }
         } catch (error) {

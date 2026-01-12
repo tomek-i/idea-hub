@@ -1,7 +1,4 @@
 'use client';
-import { ArrowRight, ExternalLink, Github, Trash2 } from 'lucide-react';
-import Link from 'next/link';
-import { toast } from 'sonner';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,6 +19,10 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet';
 import type { Project, Todo } from '@/lib/types';
+import { ArrowRight, ExternalLink, Github, Trash2 } from 'lucide-react';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import { NotesEditor } from './notes-editor';
 import { TodoList } from './todo-list';
 import { Button } from './ui/button';
@@ -48,43 +49,57 @@ export function ProjectDetailsSheet({
   onUpdateProject,
   projectActions,
 }: ProjectDetailsSheetProps) {
-  const nameId = `name-${project?.id}`;
-  const descriptionId = `description-${project?.id}`;
-  const githubUrlId = `githubUrl-${project?.id}`;
+  const [localProject, setLocalProject] = useState<Project | null>(project);
 
-  if (!project) return null;
+  // Sync local state when project prop changes
+  useEffect(() => {
+    setLocalProject(project);
+  }, [project]);
+
+  const nameId = `name-${localProject?.id}`;
+  const descriptionId = `description-${localProject?.id}`;
+  const githubUrlId = `githubUrl-${localProject?.id}`;
+
+  if (!localProject) return null;
 
   const handleFieldChange = (field: keyof Project, value: string) => {
-    onUpdateProject({ ...project, [field]: value });
+    const updatedProject = { ...localProject, [field]: value };
+    setLocalProject(updatedProject);
+    onUpdateProject(updatedProject);
   };
 
   const handleMoveToRefined = () => {
-    projectActions.updateProjectStatus(project.id, 'refined');
+    projectActions.updateProjectStatus(localProject.id, 'refined');
     onOpenChange(false);
-    toast.success(`"${project.name}" has been moved to Refined Projects.`);
+    toast.success(`"${localProject.name}" has been moved to Refined Projects.`);
   };
 
   const handleDelete = () => {
-    projectActions.deleteProject(project.id);
+    projectActions.deleteProject(localProject.id);
     onOpenChange(false);
-    toast.error(`"${project.name}" has been deleted.`);
+    toast.error(`"${localProject.name}" has been deleted.`);
+  };
+
+  const handleUpdateProjectFromNotes = (updatedProject: Project) => {
+    setLocalProject(updatedProject);
+    onUpdateProject(updatedProject);
   };
 
   return (
-    <Sheet open={!!project} onOpenChange={onOpenChange}>
+    <Sheet open={!!localProject} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-2xl flex flex-col">
         <SheetHeader>
-          <SheetTitle className="font-headline text-2xl">{project.name}</SheetTitle>
+          <SheetTitle className="font-headline text-2xl">{localProject.name}</SheetTitle>
           <SheetDescription>
-            {project.status === 'draft' ? 'Draft Idea' : 'Refined Project'}
+            {localProject.status === 'draft' ? 'Draft Idea' : 'Refined Project'}
           </SheetDescription>
         </SheetHeader>
-        <div className="flex-1 overflow-y-auto pr-6 space-y-6">
+        <div className="flex-1 overflow-y-auto px-6 space-y-6">
           <div className="space-y-2">
             <Label htmlFor={nameId}>Project Name</Label>
             <Input
               id={nameId}
-              value={project.name}
+              value={localProject.name}
               onChange={(e) => handleFieldChange('name', e.target.value)}
               className="text-lg"
             />
@@ -93,18 +108,18 @@ export function ProjectDetailsSheet({
             <Label htmlFor={descriptionId}>Description</Label>
             <Textarea
               id={descriptionId}
-              value={project.description}
+              value={localProject.description}
               onChange={(e) => handleFieldChange('description', e.target.value)}
               placeholder="A short description of the project."
               rows={3}
             />
           </div>
 
-          <NotesEditor project={project} onUpdateProject={onUpdateProject} />
+          <NotesEditor project={localProject} onUpdateProject={handleUpdateProjectFromNotes} />
 
-          <TodoList project={project} projectActions={projectActions} />
+          <TodoList project={localProject} projectActions={projectActions} />
 
-          {project.status === 'refined' && (
+          {localProject.status === 'refined' && (
             <div className="space-y-2">
               <Label htmlFor="githubUrl">
                 <div className="flex items-center gap-2">
@@ -114,14 +129,14 @@ export function ProjectDetailsSheet({
               <div className="flex items-center gap-2">
                 <Input
                   id={githubUrlId}
-                  value={project.githubUrl || ''}
+                  value={localProject.githubUrl || ''}
                   onChange={(e) => handleFieldChange('githubUrl', e.target.value)}
                   placeholder="https://github.com/user/repo"
                 />
-                {project.githubUrl && (
+                {localProject.githubUrl && (
                   <Button asChild variant="outline" size="icon">
                     <Link
-                      href={project.githubUrl}
+                      href={localProject.githubUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label="Open GitHub repository in new tab"
@@ -146,8 +161,8 @@ export function ProjectDetailsSheet({
                 <AlertDialogHeader>
                   <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This will permanently delete the project "{project.name}". This action cannot be
-                    undone.
+                    This will permanently delete the project "{localProject.name}". This action
+                    cannot be undone.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -157,7 +172,7 @@ export function ProjectDetailsSheet({
               </AlertDialogContent>
             </AlertDialog>
 
-            {project.status === 'draft' && (
+            {localProject.status === 'draft' && (
               <Button onClick={handleMoveToRefined}>
                 Move to Refined <ArrowRight className="ml-2" />
               </Button>

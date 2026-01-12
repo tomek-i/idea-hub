@@ -1,8 +1,5 @@
 'use client';
 
-import { Trash2 } from 'lucide-react';
-import { useState } from 'react';
-import { toast } from 'sonner';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,16 +12,24 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useProjectsStore } from '@/context/projects-context';
+import { Trash2 } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'sonner';
 import { Button } from './ui/button';
 
 export function PurgeDialog() {
   const [isOpen, setIsOpen] = useState(false);
   const { purgeAllProjects } = useProjectsStore();
 
-  const handlePurge = () => {
-    purgeAllProjects();
-    toast.error('All your projects have been deleted.');
-    setIsOpen(false);
+  const handlePurge = async () => {
+    try {
+      await purgeAllProjects();
+      toast.error('All your projects have been deleted.');
+      setIsOpen(false);
+    } catch (error) {
+      toast.error('Failed to purge projects.');
+      console.error('Purge error:', error);
+    }
   };
 
   return (
@@ -39,7 +44,7 @@ export function PurgeDialog() {
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
             This action cannot be undone. This will permanently delete all your project data from
-            your browser&apos;s local storage.
+            storage.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

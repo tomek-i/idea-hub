@@ -5,9 +5,6 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   images: {
     remotePatterns: [
       {
@@ -30,6 +27,10 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // Tell Next.js not to bundle these packages (they're server-only native modules)
+  serverExternalPackages: ['better-sqlite3', '@prisma/client'],
+  // Turbopack configuration
+  turbopack: {},
 };
 
 export default nextConfig;
