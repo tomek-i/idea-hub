@@ -15,7 +15,8 @@
       "*.jsx",
       "*.json",
       "docs/**/*.md",
-      "!src/components/ui/**/*"
+      "!src/components/ui/**/*",
+      "!next-env.d.ts"
     ]
   },
   "formatter": {
