@@ -15,5 +15,6 @@ export interface Project {
   githubUrl: string | null;
   status: ProjectStatus;
   archiveNotes: string | null;
+  private: boolean;
   relatedProjects?: Project[]; // Related projects (optional, loaded separately)
 }

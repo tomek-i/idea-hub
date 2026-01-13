@@ -46,6 +46,7 @@ export function IdeaGeneratorDialog({ children }: { children: React.ReactNode })
       name: idea,
       description: `Generated from keywords: "${keywords}"`,
       notes: '',
+      private: false,
     });
     toast.success(`"${idea}" has been added to your drafts.`);
   };

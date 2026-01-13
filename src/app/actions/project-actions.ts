@@ -27,6 +27,7 @@ export async function getAllProjectsAction(): Promise<Project[]> {
     githubUrl: p.githubUrl,
     status: p.status as ProjectStatus,
     archiveNotes: p.archiveNotes,
+    private: p.private ?? false,
     todos: p.todos.map((t) => ({
       id: t.id,
       text: t.text,
@@ -51,6 +52,7 @@ export async function addProjectAction(
     githubUrl: dbProject.githubUrl,
     status: dbProject.status as ProjectStatus,
     archiveNotes: dbProject.archiveNotes,
+    private: dbProject.private ?? false,
     todos: [],
   };
 }
@@ -63,6 +65,7 @@ export async function updateProjectAction(updatedProject: Project): Promise<Proj
     status: updatedProject.status,
     githubUrl: updatedProject.githubUrl || undefined,
     archiveNotes: updatedProject.archiveNotes || undefined,
+    private: updatedProject.private,
   });
   const dbProjectWithTodos = await getAllProjects();
   const fullProject = dbProjectWithTodos.find((p) => p.id === updatedProject.id);
@@ -77,6 +80,7 @@ export async function updateProjectAction(updatedProject: Project): Promise<Proj
     githubUrl: fullProject.githubUrl,
     status: fullProject.status as ProjectStatus,
     archiveNotes: fullProject.archiveNotes,
+    private: fullProject.private ?? false,
     todos: fullProject.todos.map((t) => ({
       id: t.id,
       text: t.text,
@@ -112,6 +116,7 @@ export async function updateProjectStatusAction(
     githubUrl: fullProject.githubUrl,
     status: fullProject.status as ProjectStatus,
     archiveNotes: fullProject.archiveNotes,
+    private: fullProject.private ?? false,
     todos: fullProject.todos.map((t) => ({
       id: t.id,
       text: t.text,
@@ -159,6 +164,7 @@ export async function getRelatedProjectsAction(projectId: string): Promise<Proje
     githubUrl: p.githubUrl,
     status: p.status as ProjectStatus,
     archiveNotes: p.archiveNotes,
+    private: p.private ?? false,
     todos: p.todos.map((t) => ({
       id: t.id,
       text: t.text,

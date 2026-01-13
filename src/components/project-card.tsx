@@ -52,14 +52,22 @@ export function ProjectCard({ project, onSelectProject, projectActions }: Projec
         aria-label={`View details for ${project.name}`}
       >
         <CardHeader className="w-full">
-          <CardTitle className="font-headline">{project.name}</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="font-headline">{project.name}</CardTitle>
+            <span
+              className={`ml-2 px-2 py-0.5 rounded text-xs font-semibold ${project.private ? 'bg-red-100 text-red-600 border border-red-200' : 'bg-green-100 text-green-700 border border-green-200'}`}
+              title={project.private ? 'Private repository' : 'Public repository'}
+            >
+              {project.private ? 'Private' : 'Public'}
+            </span>
+          </div>
           <CardDescription className="pt-2 whitespace-pre-wrap wrap-break-word">
             {project.description || 'No description provided.'}
           </CardDescription>
           {project.status === 'archived' && project.archiveNotes && (
             <div className="mt-3 pt-3 border-t border-border/50">
               <div className="flex items-start gap-2">
-                <Archive className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                <Archive className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
                 <div className="flex-1">
                   <p className="text-xs font-medium text-muted-foreground mb-1">Archive Notes</p>
                   <p className="text-sm text-muted-foreground whitespace-pre-wrap wrap-break-word">

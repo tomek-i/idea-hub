@@ -69,10 +69,11 @@ export function ProjectDetailsSheet({
   const nameId = `name-${localProject?.id}`;
   const descriptionId = `description-${localProject?.id}`;
   const githubUrlId = `githubUrl-${localProject?.id}`;
+  const privacyId = `privacy-${localProject?.id}`;
 
   if (!localProject) return null;
 
-  const handleFieldChange = (field: keyof Project, value: string) => {
+  const handleFieldChange = (field: keyof Project, value: string | boolean) => {
     const updatedProject = { ...localProject, [field]: value };
     setLocalProject(updatedProject);
     onUpdateProject(updatedProject);
@@ -121,6 +122,23 @@ export function ProjectDetailsSheet({
           </SheetDescription>
         </SheetHeader>
         <div className="flex-1 overflow-y-auto px-6 space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor={privacyId}>Repository Privacy</Label>
+            <div className="flex items-center gap-2">
+              <input
+                id={privacyId}
+                type="checkbox"
+                checked={!!localProject.private}
+                onChange={(e) => handleFieldChange('private', e.target.checked)}
+                className="accent-red-600 w-4 h-4"
+              />
+              <span className="text-sm">
+                {localProject.private
+                  ? 'Private (only you can see this repo)'
+                  : 'Public (anyone can see this repo)'}
+              </span>
+            </div>
+          </div>
           <div className="space-y-2">
             <Label htmlFor={nameId}>Project Name</Label>
             <Input

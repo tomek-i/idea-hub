@@ -32,6 +32,7 @@ export function ProjectColumn({
         name: newProjectName.trim(),
         description: '',
         notes: '',
+        private: false,
       });
       setNewProjectName('');
       setIsAdding(false);

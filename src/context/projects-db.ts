@@ -54,12 +54,18 @@ export async function removeProjectRelation(fromId: string, toId: string) {
   });
 }
 
-export async function addProject(data: { name: string; description: string; notes: string }) {
+export async function addProject(data: {
+  name: string;
+  description: string;
+  notes: string;
+  private?: boolean;
+}) {
   return prisma.project.create({
     data: {
       ...data,
       status: 'draft',
       githubUrl: null,
+      private: data.private ?? false,
     },
   });
 }
@@ -72,6 +78,7 @@ export async function updateProject(
     status: ProjectStatus;
     githubUrl: string;
     archiveNotes: string | null;
+    private: boolean;
   }>
 ) {
   // If status is present, ensure it is the correct enum type
@@ -129,6 +136,7 @@ interface ImportProject {
   githubUrl: string | null;
   status: ProjectStatus;
   archiveNotes: string | null;
+  private: boolean;
   todos?: Array<{
     id: string;
     text: string;
@@ -152,6 +160,7 @@ export async function importProjects(projects: ImportProject[]) {
         githubUrl: projectData.githubUrl,
         status: projectData.status,
         archiveNotes: projectData.archiveNotes || null,
+        private: projectData.private ?? false,
       },
     });
 

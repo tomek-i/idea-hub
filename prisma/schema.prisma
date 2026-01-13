@@ -24,6 +24,7 @@ model Project {
   archiveNotes String? // nullable - notes about why the project was archived
   relatedFrom  ProjectRelation[] @relation("ProjectFrom")
   relatedTo    ProjectRelation[] @relation("ProjectTo")
+  private      Boolean           @default(false) // true = private, false = public
 }
 
 model Todo {
