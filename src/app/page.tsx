@@ -63,6 +63,11 @@ export default function Home() {
         onUpdateProject={handleUpdateProject}
         onProjectSelect={handleSelectProject}
         projectActions={projectActions}
+        imageActions={{
+          uploadImage: projectActions.uploadProjectImage,
+          updateImageCaption: projectActions.updateProjectImageCaption,
+          deleteImage: projectActions.deleteProjectImage,
+        }}
       />
     </>
   );

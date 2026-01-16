@@ -6,17 +6,18 @@ export async function getAllProjects(includeRelated = false) {
     return prisma.project.findMany({
       include: {
         todos: true,
+        images: true,
         relatedTo: {
           include: {
             to: {
-              include: { todos: true },
+              include: { todos: true, images: true },
             },
           },
         },
       },
     });
   }
-  return prisma.project.findMany({ include: { todos: true } });
+  return prisma.project.findMany({ include: { todos: true, images: true } });
 }
 
 export async function getRelatedProjects(projectId: string) {
@@ -24,7 +25,7 @@ export async function getRelatedProjects(projectId: string) {
     where: { fromId: projectId },
     include: {
       to: {
-        include: { todos: true },
+        include: { todos: true, images: true },
       },
     },
   });
@@ -180,4 +181,51 @@ export async function importProjects(projects: ImportProject[]) {
       });
     }
   }
+}
+
+// Image management functions
+export async function addProjectImage(
+  projectId: string,
+  data: {
+    url: string;
+    caption?: string | null;
+    alt?: string | null;
+    width?: number | null;
+    height?: number | null;
+    fileSize?: number | null;
+    mimeType?: string | null;
+  }
+) {
+  return prisma.projectImage.create({
+    data: {
+      projectId,
+      ...data,
+    },
+  });
+}
+
+export async function updateProjectImage(
+  imageId: string,
+  data: {
+    caption?: string | null;
+    alt?: string | null;
+  }
+) {
+  return prisma.projectImage.update({
+    where: { id: imageId },
+    data,
+  });
+}
+
+export async function deleteProjectImage(imageId: string) {
+  return prisma.projectImage.delete({
+    where: { id: imageId },
+  });
+}
+
+export async function getProjectImages(projectId: string) {
+  return prisma.projectImage.findMany({
+    where: { projectId },
+    orderBy: { createdAt: 'desc' },
+  });
 }

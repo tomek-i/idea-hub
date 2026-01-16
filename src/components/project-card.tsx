@@ -1,4 +1,5 @@
-import { Archive, ArrowRight, ExternalLink, Github, ListTodo, Trash2 } from 'lucide-react';
+import { Archive, ArrowRight, ExternalLink, Github, ListTodo, Trash2, Image as ImageIcon } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import type React from 'react';
 import { toast } from 'sonner';
@@ -26,6 +27,7 @@ interface ProjectCardProps {
 
 export function ProjectCard({ project, onSelectProject, projectActions }: ProjectCardProps) {
   const completedTodos = project.todos.filter((t) => t.completed).length;
+  const firstImage = project.images?.[0];
 
   const handleMoveToRefined = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -51,6 +53,22 @@ export function ProjectCard({ project, onSelectProject, projectActions }: Projec
         className="cursor-pointer grow h-auto p-0 hover:bg-transparent focus:bg-transparent"
         aria-label={`View details for ${project.name}`}
       >
+        {firstImage && (
+          <div className="relative w-full h-32 overflow-hidden">
+            <Image
+              src={firstImage.url}
+              alt={firstImage.alt || project.name}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            />
+            {project.images && project.images.length > 1 && (
+              <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white rounded-full p-1.5">
+                <ImageIcon className="h-3 w-3" />
+              </div>
+            )}
+          </div>
+        )}
         <CardHeader className="w-full">
           <div className="flex items-center justify-between">
             <CardTitle className="font-headline">{project.name}</CardTitle>
@@ -85,6 +103,12 @@ export function ProjectCard({ project, onSelectProject, projectActions }: Projec
           <span>
             {completedTodos} / {project.todos.length}
           </span>
+          {project.images && project.images.length > 0 && (
+            <div className="flex items-center gap-1 text-muted-foreground">
+              <ImageIcon className="w-4 h-4" />
+              <span>{project.images.length}</span>
+            </div>
+          )}
           {project.githubUrl && (
             <Link
               href={project.githubUrl}
