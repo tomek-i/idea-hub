@@ -1,4 +1,4 @@
-import { Archive, ArrowRight, Github, ListTodo, Trash2 } from 'lucide-react';
+import { Archive, ArrowRight, ExternalLink, Github, ListTodo, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import type React from 'react';
 import { toast } from 'sonner';
@@ -96,6 +96,19 @@ export function ProjectCard({ project, onSelectProject, projectActions }: Projec
             >
               <Github className="w-4 h-4" />
               <span className="sr-only">GitHub</span>
+            </Link>
+          )}
+          {project.publishedUrl && (
+            <Link
+              href={project.publishedUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 text-muted-foreground hover:text-primary transition-colors"
+              onClick={(e: React.MouseEvent) => e.stopPropagation()}
+              aria-label="Open published project in new tab"
+            >
+              <ExternalLink className="w-4 h-4" />
+              <span className="sr-only">Published URL</span>
             </Link>
           )}
         </div>

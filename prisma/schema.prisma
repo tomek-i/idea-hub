@@ -20,6 +20,7 @@ model Project {
   notes        String
   todos        Todo[]
   githubUrl    String? // nullable
+  publishedUrl String? // nullable - URL for deployed/published project
   status       ProjectStatus
   archiveNotes String? // nullable - notes about why the project was archived
   relatedFrom  ProjectRelation[] @relation("ProjectFrom")
