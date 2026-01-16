@@ -66,6 +66,7 @@ export async function addProject(data: {
       ...data,
       status: 'draft',
       githubUrl: null,
+      publishedUrl: null,
       private: data.private ?? false,
     },
   });
@@ -78,6 +79,7 @@ export async function updateProject(
     notes: string;
     status: ProjectStatus;
     githubUrl: string;
+    publishedUrl: string;
     archiveNotes: string | null;
     private: boolean;
   }>
@@ -135,6 +137,7 @@ interface ImportProject {
   description: string;
   notes: string;
   githubUrl: string | null;
+  publishedUrl: string | null;
   status: ProjectStatus;
   archiveNotes: string | null;
   private: boolean;
@@ -159,6 +162,7 @@ export async function importProjects(projects: ImportProject[]) {
         description: projectData.description,
         notes: projectData.notes,
         githubUrl: projectData.githubUrl,
+        publishedUrl: projectData.publishedUrl,
         status: projectData.status,
         archiveNotes: projectData.archiveNotes || null,
         private: projectData.private ?? false,

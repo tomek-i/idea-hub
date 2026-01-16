@@ -29,6 +29,7 @@ export async function getAllProjectsAction(): Promise<Project[]> {
     description: p.description,
     notes: p.notes,
     githubUrl: p.githubUrl,
+    publishedUrl: p.publishedUrl,
     status: p.status as ProjectStatus,
     archiveNotes: p.archiveNotes,
     private: p.private ?? false,
@@ -54,7 +55,7 @@ export async function getAllProjectsAction(): Promise<Project[]> {
 }
 
 export async function addProjectAction(
-  newProject: Omit<Project, 'id' | 'todos' | 'githubUrl' | 'status' | 'archiveNotes' | 'images'>
+  newProject: Omit<Project, 'id' | 'todos' | 'githubUrl' | 'publishedUrl' | 'status' | 'archiveNotes' | 'images'>
 ): Promise<Project> {
   const dbProject = await dbAddProject({
     name: newProject.name,
@@ -67,6 +68,7 @@ export async function addProjectAction(
     description: dbProject.description,
     notes: dbProject.notes,
     githubUrl: dbProject.githubUrl,
+    publishedUrl: dbProject.publishedUrl,
     status: dbProject.status as ProjectStatus,
     archiveNotes: dbProject.archiveNotes,
     private: dbProject.private ?? false,
@@ -82,6 +84,7 @@ export async function updateProjectAction(updatedProject: Project): Promise<Proj
     notes: updatedProject.notes,
     status: updatedProject.status,
     githubUrl: updatedProject.githubUrl || undefined,
+    publishedUrl: updatedProject.publishedUrl || undefined,
     archiveNotes: updatedProject.archiveNotes || undefined,
     private: updatedProject.private,
   });
@@ -96,6 +99,7 @@ export async function updateProjectAction(updatedProject: Project): Promise<Proj
     description: fullProject.description,
     notes: fullProject.notes,
     githubUrl: fullProject.githubUrl,
+    publishedUrl: fullProject.publishedUrl,
     status: fullProject.status as ProjectStatus,
     archiveNotes: fullProject.archiveNotes,
     private: fullProject.private ?? false,
@@ -145,6 +149,7 @@ export async function updateProjectStatusAction(
     description: fullProject.description,
     notes: fullProject.notes,
     githubUrl: fullProject.githubUrl,
+    publishedUrl: fullProject.publishedUrl,
     status: fullProject.status as ProjectStatus,
     archiveNotes: fullProject.archiveNotes,
     private: fullProject.private ?? false,
@@ -206,6 +211,7 @@ export async function getRelatedProjectsAction(projectId: string): Promise<Proje
     description: p.description,
     notes: p.notes,
     githubUrl: p.githubUrl,
+    publishedUrl: p.publishedUrl,
     status: p.status as ProjectStatus,
     archiveNotes: p.archiveNotes,
     private: p.private ?? false,

@@ -323,6 +323,34 @@ export function ProjectDetailsSheet({
               )}
             </div>
           </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="publishedUrl">
+              <div className="flex items-center gap-2">
+                <ExternalLink className="w-4 h-4" /> Published URL
+              </div>
+            </Label>
+            <div className="flex items-center gap-2">
+              <Input
+                id="publishedUrl"
+                value={localProject.publishedUrl || ''}
+                onChange={(e) => handleFieldChange('publishedUrl', e.target.value)}
+                placeholder="https://example.com"
+              />
+              {localProject.publishedUrl && (
+                <Button asChild variant="outline" size="icon">
+                  <Link
+                    href={localProject.publishedUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Open published project in new tab"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                  </Link>
+                </Button>
+              )}
+            </div>
+          </div>
         </div>
         <SheetFooter className="mt-auto pt-4 border-t">
           <div className="flex justify-between w-full">

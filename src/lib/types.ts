@@ -27,6 +27,7 @@ export interface Project {
   notes: string;
   todos: Todo[];
   githubUrl: string | null;
+  publishedUrl: string | null;
   status: ProjectStatus;
   archiveNotes: string | null;
   private: boolean;
