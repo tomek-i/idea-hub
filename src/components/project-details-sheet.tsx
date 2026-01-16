@@ -32,6 +32,7 @@ import { TodoList } from './todo-list';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
+import { Switch } from './ui/switch';
 import { Textarea } from './ui/textarea';
 import {
   uploadProjectImageAction,
@@ -201,15 +202,13 @@ export function ProjectDetailsSheet({
           </SheetDescription>
         </SheetHeader>
         <div className="flex-1 overflow-y-auto px-6 space-y-6">
-          <div className="space-y-2">
+<div className="space-y-2">
             <Label htmlFor={privacyId}>Repository Privacy</Label>
             <div className="flex items-center gap-2">
-              <input
+              <Switch
                 id={privacyId}
-                type="checkbox"
                 checked={!!localProject.private}
-                onChange={(e) => handleFieldChange('private', e.target.checked)}
-                className="accent-red-600 w-4 h-4"
+                onCheckedChange={(checked) => handleFieldChange('private', checked)}
               />
               <span className="text-sm">
                 {localProject.private
