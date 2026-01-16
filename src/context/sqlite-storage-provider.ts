@@ -11,6 +11,10 @@ import {
   updateProjectAction,
   updateProjectStatusAction,
   updateTodoAction,
+  uploadProjectImageAction,
+  updateProjectImageCaptionAction,
+  deleteProjectImageAction,
+  getProjectImagesAction,
 } from '@/app/actions/project-actions';
 import type { Project, ProjectStatus, Todo } from '@/lib/types';
 import type { StorageProvider } from './storage-provider';
@@ -60,5 +64,27 @@ export class SqliteStorageProvider implements StorageProvider {
 
   async importProjects(projects: Project[]): Promise<void> {
     return importProjectsAction(projects);
+  }
+
+  async getProject(projectId: string): Promise<Project> {
+    // Get all projects and find the one we need
+    const allProjects = await getAllProjectsAction();
+    const project = allProjects.find(p => p.id === projectId);
+    if (!project) {
+      throw new Error(`Project with id ${projectId} not found`);
+    }
+    return project;
+  }
+
+  async uploadProjectImage(projectId: string, formData: FormData): Promise<void> {
+    await uploadProjectImageAction(projectId, formData);
+  }
+
+  async updateProjectImageCaption(imageId: string, caption: string): Promise<void> {
+    await updateProjectImageCaptionAction(imageId, caption);
+  }
+
+  async deleteProjectImage(imageId: string): Promise<void> {
+    await deleteProjectImageAction(imageId);
   }
 }

@@ -25,6 +25,7 @@ model Project {
   relatedFrom  ProjectRelation[] @relation("ProjectFrom")
   relatedTo    ProjectRelation[] @relation("ProjectTo")
   private      Boolean           @default(false) // true = private, false = public
+  images       ProjectImage[]
 }
 
 model Todo {
@@ -33,6 +34,23 @@ model Todo {
   completed Boolean
   project   Project @relation(fields: [projectId], references: [id])
   projectId String
+}
+
+model ProjectImage {
+  id          String   @id @default(uuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  url         String
+  caption     String?  // figure caption for the image
+  alt         String?  // alt text for accessibility
+  width       Int?     // image width in pixels
+  height      Int?     // image height in pixels
+  fileSize    Int?     // file size in bytes
+  mimeType    String?  // MIME type (e.g., "image/jpeg", "image/png")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([projectId])
 }
 
 model ProjectRelation {

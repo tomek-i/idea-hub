@@ -1,7 +1,7 @@
 'use client';
-import { Archive, ArchiveRestore, ArrowRight, ExternalLink, Github, Trash2 } from 'lucide-react';
+import { Archive, ArchiveRestore, ArrowRight, ExternalLink, Github, Trash2, ImagePlus } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import {
   AlertDialog,
@@ -24,6 +24,8 @@ import {
 } from '@/components/ui/sheet';
 import type { Project, Todo } from '@/lib/types';
 import { ArchiveDialog } from './archive-dialog';
+import { ImageUpload } from './image-upload';
+import { ImageGallery } from './image-gallery';
 import { NotesEditor } from './notes-editor';
 import { RelatedProjects } from './related-projects';
 import { TodoList } from './todo-list';
@@ -31,6 +33,12 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
+import {
+  uploadProjectImageAction,
+  updateProjectImageCaptionAction,
+  deleteProjectImageAction,
+  getProjectImagesAction,
+} from '@/app/actions/project-actions';
 
 interface ProjectDetailsSheetProps {
   project: Project | null;
@@ -49,6 +57,11 @@ interface ProjectDetailsSheetProps {
     updateTodo: (projectId: string, updatedTodo: Todo) => void;
     deleteTodo: (projectId: string, todoId: string) => void;
   };
+  imageActions?: {
+    uploadImage: (projectId: string, formData: FormData) => Promise<void>;
+    updateImageCaption: (imageId: string, caption: string) => Promise<void>;
+    deleteImage: (imageId: string) => Promise<void>;
+  };
 }
 
 export function ProjectDetailsSheet({
@@ -58,8 +71,12 @@ export function ProjectDetailsSheet({
   onUpdateProject,
   onProjectSelect,
   projectActions,
+  imageActions,
 }: ProjectDetailsSheetProps) {
   const [localProject, setLocalProject] = useState<Project | null>(project);
+  const [isUploading, setIsUploading] = useState(false);
+  const [showImageUpload, setShowImageUpload] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   // Sync local state when project prop changes
   useEffect(() => {
@@ -106,6 +123,68 @@ export function ProjectDetailsSheet({
   const handleUpdateProjectFromNotes = (updatedProject: Project) => {
     setLocalProject(updatedProject);
     onUpdateProject(updatedProject);
+  };
+
+  const handleImageUpload = async (files: File[]) => {
+    if (!imageActions || files.length === 0) return;
+
+    setIsUploading(true);
+    try {
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append('file', file);
+        await imageActions.uploadImage(localProject.id, formData);
+      }
+      
+      // Refresh project data to show new images
+      startTransition(async () => {
+        const updatedImages = await getProjectImagesAction(localProject.id);
+        setLocalProject(prev => prev ? { ...prev, images: updatedImages } : null);
+      });
+      
+      toast.success(`${files.length} image(s) uploaded successfully`);
+      setShowImageUpload(false);
+    } catch (error) {
+      toast.error('Failed to upload images');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleUpdateImageCaption = async (imageId: string, caption: string) => {
+    if (!imageActions) return;
+
+    try {
+      await imageActions.updateImageCaption(imageId, caption);
+      
+      // Refresh project data
+      startTransition(async () => {
+        const updatedImages = await getProjectImagesAction(localProject.id);
+        setLocalProject(prev => prev ? { ...prev, images: updatedImages } : null);
+      });
+      
+      toast.success('Caption updated');
+    } catch (error) {
+      toast.error('Failed to update caption');
+    }
+  };
+
+  const handleDeleteImage = async (imageId: string) => {
+    if (!imageActions) return;
+
+    try {
+      await imageActions.deleteImage(imageId);
+      
+      // Refresh project data
+      startTransition(async () => {
+        const updatedImages = await getProjectImagesAction(localProject.id);
+        setLocalProject(prev => prev ? { ...prev, images: updatedImages } : null);
+      });
+      
+      toast.success('Image deleted');
+    } catch (error) {
+      toast.error('Failed to delete image');
+    }
   };
 
   return (
@@ -160,6 +239,38 @@ export function ProjectDetailsSheet({
           </div>
 
           <NotesEditor project={localProject} onUpdateProject={handleUpdateProjectFromNotes} />
+
+          {/* Image Management Section */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <Label className="text-sm font-semibold flex items-center gap-2">
+                <ImagePlus className="w-4 h-4" /> Project Images
+              </Label>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowImageUpload(!showImageUpload)}
+                disabled={isUploading}
+              >
+                <ImagePlus className="mr-2 h-4 w-4" />
+                {showImageUpload ? 'Cancel' : 'Add Images'}
+              </Button>
+            </div>
+
+            {showImageUpload && (
+              <ImageUpload
+                onUpload={handleImageUpload}
+                className="mt-4"
+              />
+            )}
+
+            <ImageGallery
+              images={localProject.images}
+              onDelete={imageActions ? handleDeleteImage : undefined}
+              onUpdateCaption={imageActions ? handleUpdateImageCaption : undefined}
+              className="mt-4"
+            />
+          </div>
 
           {localProject.status === 'archived' && localProject.archiveNotes && (
             <div className="space-y-2 p-4 bg-muted rounded-lg border">

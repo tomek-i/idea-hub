@@ -4,17 +4,21 @@ import {
   addProject as dbAddProject,
   addProjectRelation as dbAddProjectRelation,
   addTodo as dbAddTodo,
+  addProjectImage as dbAddProjectImage,
   deleteProject as dbDeleteProject,
   deleteTodo as dbDeleteTodo,
+  deleteProjectImage as dbDeleteProjectImage,
   getRelatedProjects as dbGetRelatedProjects,
   importProjects as dbImportProjects,
   purgeAllProjects as dbPurgeAllProjects,
   removeProjectRelation as dbRemoveProjectRelation,
   updateProject as dbUpdateProject,
   updateTodo as dbUpdateTodo,
+  updateProjectImage as dbUpdateProjectImage,
+  getProjectImages as dbGetProjectImages,
   getAllProjects,
 } from '@/context/projects-db';
-import type { Project, ProjectStatus, Todo } from '@/lib/types';
+import type { Project, ProjectStatus, Todo, ProjectImage } from '@/lib/types';
 
 export async function getAllProjectsAction(): Promise<Project[]> {
   const dbProjects = await getAllProjects();
@@ -28,6 +32,19 @@ export async function getAllProjectsAction(): Promise<Project[]> {
     status: p.status as ProjectStatus,
     archiveNotes: p.archiveNotes,
     private: p.private ?? false,
+    images: p.images.map((img) => ({
+      id: img.id,
+      projectId: img.projectId,
+      url: img.url,
+      caption: img.caption,
+      alt: img.alt,
+      width: img.width,
+      height: img.height,
+      fileSize: img.fileSize,
+      mimeType: img.mimeType,
+      createdAt: img.createdAt,
+      updatedAt: img.updatedAt,
+    })),
     todos: p.todos.map((t) => ({
       id: t.id,
       text: t.text,
@@ -37,7 +54,7 @@ export async function getAllProjectsAction(): Promise<Project[]> {
 }
 
 export async function addProjectAction(
-  newProject: Omit<Project, 'id' | 'todos' | 'githubUrl' | 'status' | 'archiveNotes'>
+  newProject: Omit<Project, 'id' | 'todos' | 'githubUrl' | 'status' | 'archiveNotes' | 'images'>
 ): Promise<Project> {
   const dbProject = await dbAddProject({
     name: newProject.name,
@@ -53,6 +70,7 @@ export async function addProjectAction(
     status: dbProject.status as ProjectStatus,
     archiveNotes: dbProject.archiveNotes,
     private: dbProject.private ?? false,
+    images: [],
     todos: [],
   };
 }
@@ -81,6 +99,19 @@ export async function updateProjectAction(updatedProject: Project): Promise<Proj
     status: fullProject.status as ProjectStatus,
     archiveNotes: fullProject.archiveNotes,
     private: fullProject.private ?? false,
+    images: fullProject.images.map((img) => ({
+      id: img.id,
+      projectId: img.projectId,
+      url: img.url,
+      caption: img.caption,
+      alt: img.alt,
+      width: img.width,
+      height: img.height,
+      fileSize: img.fileSize,
+      mimeType: img.mimeType,
+      createdAt: img.createdAt,
+      updatedAt: img.updatedAt,
+    })),
     todos: fullProject.todos.map((t) => ({
       id: t.id,
       text: t.text,
@@ -117,6 +148,19 @@ export async function updateProjectStatusAction(
     status: fullProject.status as ProjectStatus,
     archiveNotes: fullProject.archiveNotes,
     private: fullProject.private ?? false,
+    images: fullProject.images.map((img) => ({
+      id: img.id,
+      projectId: img.projectId,
+      url: img.url,
+      caption: img.caption,
+      alt: img.alt,
+      width: img.width,
+      height: img.height,
+      fileSize: img.fileSize,
+      mimeType: img.mimeType,
+      createdAt: img.createdAt,
+      updatedAt: img.updatedAt,
+    })),
     todos: fullProject.todos.map((t) => ({
       id: t.id,
       text: t.text,
@@ -165,6 +209,19 @@ export async function getRelatedProjectsAction(projectId: string): Promise<Proje
     status: p.status as ProjectStatus,
     archiveNotes: p.archiveNotes,
     private: p.private ?? false,
+    images: p.images.map((img) => ({
+      id: img.id,
+      projectId: img.projectId,
+      url: img.url,
+      caption: img.caption,
+      alt: img.alt,
+      width: img.width,
+      height: img.height,
+      fileSize: img.fileSize,
+      mimeType: img.mimeType,
+      createdAt: img.createdAt,
+      updatedAt: img.updatedAt,
+    })),
     todos: p.todos.map((t) => ({
       id: t.id,
       text: t.text,
@@ -179,4 +236,105 @@ export async function addProjectRelationAction(fromId: string, toId: string): Pr
 
 export async function removeProjectRelationAction(fromId: string, toId: string): Promise<void> {
   await dbRemoveProjectRelation(fromId, toId);
+}
+
+// Image management actions
+export async function uploadProjectImageAction(
+  projectId: string,
+  formData: FormData
+): Promise<ProjectImage> {
+  const file = formData.get('file') as File;
+  const caption = formData.get('caption') as string | null;
+  const alt = formData.get('alt') as string | null;
+
+  if (!file) {
+    throw new Error('No file provided');
+  }
+
+  // Validate file type
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+  if (!allowedTypes.includes(file.type)) {
+    throw new Error('Invalid file type. Only JPEG, PNG, GIF, and WebP are allowed.');
+  }
+
+  // Generate unique filename
+  const bytes = await file.arrayBuffer();
+  const buffer = Buffer.from(bytes);
+  const timestamp = Date.now();
+  const filename = `${projectId}-${timestamp}-${file.name}`;
+  const filepath = `uploads/${filename}`;
+
+  // Save file to public/uploads directory
+  const fs = require('fs').promises;
+  const path = require('path');
+  
+  try {
+    await fs.writeFile(path.join(process.cwd(), 'public', filepath), buffer);
+  } catch (error) {
+    throw new Error('Failed to save file');
+  }
+
+  // For now, we'll skip dimension extraction to avoid canvas dependency issues
+  // In production, you might want to use a proper image processing library
+  const width = null;
+  const height = null;
+
+  // Create database record
+  const dbImage = await dbAddProjectImage(projectId, {
+    url: `/${filepath}`,
+    caption,
+    alt,
+    width,
+    height,
+    fileSize: file.size,
+    mimeType: file.type,
+  });
+
+  return {
+    id: dbImage.id,
+    projectId: dbImage.projectId,
+    url: dbImage.url,
+    caption: dbImage.caption,
+    alt: dbImage.alt,
+    width: dbImage.width,
+    height: dbImage.height,
+    fileSize: dbImage.fileSize,
+    mimeType: dbImage.mimeType,
+    createdAt: dbImage.createdAt,
+    updatedAt: dbImage.updatedAt,
+  };
+}
+
+export async function updateProjectImageCaptionAction(
+  imageId: string,
+  caption: string
+): Promise<void> {
+  await dbUpdateProjectImage(imageId, { caption });
+}
+
+export async function deleteProjectImageAction(imageId: string): Promise<void> {
+  try {
+    // For now, we'll just delete from database
+    // In production, you'd want to delete the file from storage too
+    await dbDeleteProjectImage(imageId);
+  } catch (error) {
+    throw new Error('Failed to delete image');
+  }
+}
+
+export async function getProjectImagesAction(projectId: string): Promise<ProjectImage[]> {
+  const dbImages = await dbGetProjectImages(projectId);
+  return dbImages.map((img) => ({
+    id: img.id,
+    projectId: img.projectId,
+    url: img.url,
+    caption: img.caption,
+    alt: img.alt,
+    width: img.width,
+    height: img.height,
+    fileSize: img.fileSize,
+    mimeType: img.mimeType,
+    createdAt: img.createdAt,
+    updatedAt: img.updatedAt,
+  }));
 }

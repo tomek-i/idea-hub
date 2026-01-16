@@ -57,6 +57,11 @@ export default function DraftsPage() {
         onUpdateProject={handleUpdateProject}
         onProjectSelect={handleSelectProject}
         projectActions={projectActions}
+        imageActions={{
+          uploadImage: projectActions.uploadProjectImage,
+          updateImageCaption: projectActions.updateProjectImageCaption,
+          deleteImage: projectActions.deleteProjectImage,
+        }}
       />
     </>
   );

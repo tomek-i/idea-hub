@@ -20,6 +20,9 @@ export type ProjectActions = {
   deleteTodo: (projectId: string, todoId: string) => void;
   setAllProjects: (newProjects: Project[]) => void;
   purgeAllProjects: () => void;
+  uploadProjectImage: (projectId: string, formData: FormData) => Promise<void>;
+  updateProjectImageCaption: (imageId: string, caption: string) => Promise<void>;
+  deleteProjectImage: (imageId: string) => Promise<void>;
 };
 
 type ProjectsContextType = {
@@ -188,6 +191,52 @@ export function ProjectsProvider({ children, storageProvider }: ProjectsProvider
     }
   }, [storageProvider]);
 
+  const uploadProjectImage = useCallback(
+    async (projectId: string, formData: FormData) => {
+      try {
+        await storageProvider.uploadProjectImage(projectId, formData);
+        // Refresh the project to get updated images
+        const updated = await storageProvider.getProject(projectId);
+        setProjects((prev) => prev.map((p) => (p.id === projectId ? updated : p)));
+      } catch (error) {
+        console.error('Failed to upload project image', error);
+        throw error;
+      }
+    },
+    [storageProvider]
+  );
+
+  const updateProjectImageCaption = useCallback(
+    async (imageId: string, caption: string) => {
+      try {
+        await storageProvider.updateProjectImageCaption(imageId, caption);
+        // We would need to refresh all projects or find which project contains this image
+        // For now, let's reload all projects
+        const loadedProjects = await storageProvider.getAllProjects();
+        setProjects(loadedProjects);
+      } catch (error) {
+        console.error('Failed to update image caption', error);
+        throw error;
+      }
+    },
+    [storageProvider]
+  );
+
+  const deleteProjectImage = useCallback(
+    async (imageId: string) => {
+      try {
+        await storageProvider.deleteProjectImage(imageId);
+        // Similar to caption update, reload all projects
+        const loadedProjects = await storageProvider.getAllProjects();
+        setProjects(loadedProjects);
+      } catch (error) {
+        console.error('Failed to delete project image', error);
+        throw error;
+      }
+    },
+    [storageProvider]
+  );
+
   const value = {
     projects,
     isLoaded,
@@ -200,6 +249,9 @@ export function ProjectsProvider({ children, storageProvider }: ProjectsProvider
     deleteTodo,
     setAllProjects,
     purgeAllProjects,
+    uploadProjectImage,
+    updateProjectImageCaption,
+    deleteProjectImage,
   };
 
   return <ProjectsContext.Provider value={value}>{children}</ProjectsContext.Provider>;
