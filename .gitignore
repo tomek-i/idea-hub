@@ -149,3 +149,4 @@ dev.db
 .worktrees/
 .security-key
 logs/security/
+/public/uploads
